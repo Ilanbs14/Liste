@@ -388,7 +388,7 @@ body.ready .title .ltr.bump { animation: ltr-bump .65s var(--ease-pop); }
 /* ==========================================================================
    MESSAGES (toasts)
    ========================================================================== */
-.toasts { position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom)); z-index: 70; width: min(92vw, 450px); transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: .6rem; pointer-events: none; }
+.toasts { position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom)); z-index: 90; width: min(92vw, 450px); transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: .6rem; pointer-events: none; }
 .toast {
   pointer-events: auto; max-width: 100%; padding: .75rem 1.15rem; border-radius: 18px; text-align: center;
   font-weight: 700; font-size: .95rem; line-height: 1.35; color: var(--snow);
@@ -417,30 +417,30 @@ body.ready .title .ltr.bump { animation: ltr-bump .65s var(--ease-pop); }
 .secrets-overlay.open { opacity: 1; visibility: visible; transition: opacity .3s ease, visibility 0s linear 0s; }
 .secrets-backdrop { position: absolute; inset: 0; background: rgba(3, 6, 20, .74); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
 .secrets {
-  position: relative; width: min(94vw, 900px); max-height: min(92vh, 940px); overflow: auto; overscroll-behavior: contain;
+  position: relative; width: min(94vw, 900px); max-height: min(95vh, 940px); overflow: auto; overscroll-behavior: contain;
   border-radius: 26px; color: var(--snow); outline: none;
   background: linear-gradient(180deg, #16215c, #0b1337);
   box-shadow: 0 40px 100px rgba(0, 0, 0, .65), 0 0 0 1px rgba(255, 255, 255, .14);
   transform: translateY(26px) scale(.95); transition: transform .45s var(--ease-pop);
 }
 .secrets-overlay.open .secrets { transform: none; }
-.secrets-head { display: flex; align-items: center; justify-content: space-between; margin: 0; padding: 1.2rem 1.4rem .2rem; }
+.secrets-head { display: flex; align-items: center; justify-content: space-between; margin: 0; padding: 1rem 1.4rem .1rem; }
 .secrets-head h2 { font-family: var(--font-title); font-weight: 700; font-size: 2.1rem; color: var(--gold); }
 .icon-btn { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: rgba(255, 255, 255, .1); color: #fff; font-size: 1.7rem; line-height: 1; transition: background .2s, transform .3s var(--ease-pop); }
 .icon-btn:hover { background: var(--red); transform: rotate(90deg); }
 .secrets-intro { padding: 0 1.4rem; color: var(--ice); }
-.secrets-progress { display: flex; align-items: center; gap: .8rem; padding: 1rem 1.4rem .4rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+.secrets-progress { display: flex; align-items: center; gap: .8rem; padding: .7rem 1.4rem .2rem; font-weight: 900; font-variant-numeric: tabular-nums; }
 .bar { flex: 1; height: 12px; border-radius: 99px; overflow: hidden; background: rgba(255, 255, 255, .12); }
 .bar i { display: block; height: 100%; width: 0; border-radius: 99px; background: repeating-linear-gradient(-45deg, #d62839 0 10px, #f7fbff 10px 20px); background-size: 28.28px 28.28px; animation: stripes 1s linear infinite; transition: width .7s var(--ease-pop); }
-.secrets-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: .6rem; padding: .7rem 1.4rem 1rem; }
-.secret { display: flex; gap: .85rem; align-items: flex-start; padding: .7rem .95rem; border-radius: 16px; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .1); }
+.secrets-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: .5rem; padding: .5rem 1.4rem .6rem; }
+.secret { display: flex; gap: .85rem; align-items: flex-start; padding: .55rem .9rem; border-radius: 16px; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .1); }
 .secret-ico { flex: none; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; background: rgba(255, 255, 255, .1); color: var(--ice-dim); font-size: 1.4rem; font-weight: 900; line-height: 1; }
 .secret b { display: block; }
 .secret p { margin-top: .1rem; font-size: .88rem; line-height: 1.4; color: var(--ice); }
 .secret.is-locked p { font-style: italic; opacity: .85; }
 .secret.is-found { background: linear-gradient(90deg, rgba(255, 209, 102, .17), rgba(255, 209, 102, .05)); border-color: rgba(255, 209, 102, .42); }
 .secret.is-found .secret-ico { background: rgba(255, 209, 102, .24); }
-.secrets-foot { padding: 0 1.4rem 1.3rem; text-align: right; }
+.secrets-foot { padding: 0 1.4rem .9rem; text-align: right; }
 .secrets-foot .link { color: var(--ice-dim); font-size: .85rem; }
 
 /* ==========================================================================

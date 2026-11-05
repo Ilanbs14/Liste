@@ -18,7 +18,7 @@
     { id: 'lights',   icon: '💡', title: 'Soirée disco',          desc: 'Tu as lancé le mode disco de la guirlande.', hint: 'La guirlande a plusieurs humeurs. Clique sur ses ampoules.' },
     { id: 'skygift',  icon: '🛷', title: 'Livraison express',     desc: 'Tu as attrapé le traîneau et récupéré un cadeau.', hint: 'Le traîneau passe de temps en temps dans le ciel… attrape-le !' },
     { id: 'unwrap',   icon: '🎁', title: 'Le grand déballage',    desc: 'Tu as déballé tous les paquets d\'un seul coup.', hint: 'Un bouton permet de tout déballer d\'un seul coup. Quelle impatience !' },
-    { id: 'elves',    icon: '🧝', title: 'La chasse aux lutins',   desc: 'Tu as retrouvé tous les lutins cachés.', hint: 'Des lutins se cachent un peu partout. Ouvre l\'œil (et déballe les paquets).' },
+    { id: 'elves',    icon: '🧝', title: 'La chasse aux lutins',   desc: 'Tu as retrouvé tous les lutins cachés.', hint: 'Des lutins se cachent un peu partout : dans le décor, au pied du sapin, au bord de la liste, derrière un paquet… Ouvre l\'œil !' },
     { id: 'grinch',   icon: '💚', title: 'Un invité grincheux',   desc: 'Tu as invoqué le grincheux vert.', hint: 'Écris au clavier le nom de celui qui déteste Noël.' },
     { id: 'rudolph',  icon: '🔴', title: 'Le nez qui brille',     desc: 'Tu as réveillé Rudolph, le renne au nez rouge.', hint: 'Écris au clavier le nom du renne le plus célèbre.' },
     { id: 'blizzard', icon: '❄️', title: 'Tempête de neige',      desc: 'Tu as déclenché le blizzard.', hint: 'Écris au clavier ce qui tombe du ciel en hiver.' },

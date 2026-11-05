@@ -86,7 +86,7 @@ Si tu veux garder la surprise, arrête de lire ici.
 - **La guirlande** : clique sur les ampoules pour changer de mode, jusqu'au mode disco.
 - **Livraison express** : clique sur le traîneau quand il passe dans le ciel.
 - **Le grand déballage** : bouton « Tout déballer ».
-- **La chasse aux lutins** : 5 lutins sont cachés (toit du village, sapin, bord de la liste, dos d'un paquet, bas de page).
+- **La chasse aux lutins** : 5 lutins sont cachés (sur un toit du village, au pied du sapin, au bord de la liste, derrière le 3e paquet, en bas de page). Le compteur « Lutins » est dans le pied de page.
 - **Mots à taper au clavier** : `grinch`, `rudolph` (ou `renne`), `neige` (ou `blizzard`) et `noel`.
 - **Chut, ça dort** : ne bouge plus la souris pendant 25 secondes.
 - **Tout trouver** débloque le mode doré. 🌟

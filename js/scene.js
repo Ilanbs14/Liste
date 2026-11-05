@@ -551,24 +551,30 @@
     const heroRect = hero.getBoundingClientRect();
     const top0 = heroRect.top;                    // pour raisonner comme si la page n'était pas défilée
     const heroH = heroRect.height;
-    const rel = (r) => ({ l: r.left, r: r.right, t: r.top - top0, b: r.bottom - top0 });
-    const blockers = $$('.hero-content > *, #tree, #snowman')
-      .map((el) => rel(el.getBoundingClientRect()))
-      .filter((r) => r.r - r.l > 0 && r.b - r.t > 0);
+    // obstacles : le texte d'accueil (avec une marge de confort) et le dessin du sapin / du bonhomme de neige
+    const toBox = (el, pad) => {
+      const r = el.getBoundingClientRect();
+      return { l: r.left - pad, r: r.right + pad, t: r.top - top0 - pad, b: r.bottom - top0 + pad };
+    };
+    const blockers = $$('.hero-content > *').map((el) => toBox(el, 12))
+      .concat($$('#tree .tree-body, #snowman .snowman-svg').map((el) => toBox(el, 2)))
+      .filter((b) => b.r - b.l > 4 && b.b - b.t > 4);
+    const area = (a) => Math.max(0, a.r - a.l) * Math.max(0, a.b - a.t);
+    const overlapWith = (a, b) => area({ l: Math.max(a.l, b.l), r: Math.min(a.r, b.r), t: Math.max(a.t, b.t), b: Math.min(a.b, b.b) });
 
     const wanted = vw >= 900 ? vw * 0.7 : vw * 0.55;
     const cands = marks.map((m) => {
       const r = m.getBoundingClientRect();
       const cx = r.left + r.width / 2, cy = r.top - top0;
       const box = { l: cx - ew / 2, r: cx + ew / 2, t: cy - eh + 2 * k, b: cy + 2 * k };
-      const inView = box.l >= 10 && box.r <= vw - 10 && box.t >= 76 && box.b <= heroH - 8;
-      const hidden = blockers.some((b) => box.r > b.l - 12 && box.l < b.r + 12 && box.b > b.t - 8 && box.t < b.b + 8);
-      return { m, inView, hidden, dist: Math.abs(cx - wanted) };
+      const inView = box.l >= 10 && box.r <= vw - 10 && box.t >= 76 && box.b <= heroH - 54;
+      // part du lutin recouverte par un obstacle (0 = libre, 1 = totalement caché)
+      const covered = Math.min(1, blockers.reduce((sum, b) => sum + overlapWith(box, b), 0) / area(box));
+      return { m, inView, covered, ground: m.classList.contains('ground'), dist: Math.abs(cx - wanted) };
     });
-    const best =
-      cands.filter((c) => c.inView && !c.hidden).sort((a, b) => a.dist - b.dist)[0] ||
-      cands.filter((c) => c.inView).sort((a, b) => a.dist - b.dist)[0] ||
-      cands.sort((a, b) => a.dist - b.dist)[0];
+    // à l'écran > le moins recouvert > une cheminée plutôt que le sol > proche de la zone voulue
+    const score = (c) => (c.inView ? 0 : 1e7) + c.covered * 1e5 + (c.ground ? 2000 : 0) + c.dist;
+    const best = cands.slice().sort((a, b) => score(a) - score(b))[0];
     if (!best) return;
     const x = parseFloat(best.m.getAttribute('data-x'));
     const y = parseFloat(best.m.getAttribute('data-y'));

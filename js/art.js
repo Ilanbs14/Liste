@@ -486,6 +486,12 @@
       const px = r() * W, py = nearY(px) + 8 + r() * 34;
       svg += `<circle class="sp" cx="${px.toFixed(0)}" cy="${py.toFixed(0)}" r="${(0.8 + r() * 1.6).toFixed(1)}" fill="#fff" style="animation-delay:${(r() * 5).toFixed(2)}s"/>`;
     }
+    // Emplacements de secours au sol (dans la neige) : utiles quand les cheminées sont cachées, sur petit écran
+    for (let gx = 140; gx < W - 100; gx += 80) {
+      const gy = nearY(gx) - 24;
+      svg += `<circle class="chim ground" cx="${gx}" cy="${gy.toFixed(1)}" r="1" fill="none" data-x="${gx}" data-y="${gy.toFixed(1)}"/>`;
+    }
+
     // Le lutin du toit est dessiné en dernier : rien ne peut le recouvrir.
     // Position par défaut : une cheminée à droite du centre (scene.js la déplace si besoin).
     const home = chims.slice().sort((a, b) => Math.abs(a.x - 1000) - Math.abs(b.x - 1000))[0];
