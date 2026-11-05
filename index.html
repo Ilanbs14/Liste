@@ -6,19 +6,43 @@
   <title>Ma Liste de Noël</title>
   <meta name="description" content="Ma liste de Noël version féerique : déballe les paquets pour découvrir mes envies !">
   <meta name="theme-color" content="#0a1230">
+  <meta name="color-scheme" content="dark">
+  <!-- Liste privée : on demande aux moteurs de recherche de ne pas l'indexer -->
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Aperçu quand on partage le lien (WhatsApp, iMessage, Messenger, Discord, Slack…).
+       ⚠️ Les adresses ci-dessous doivent être complètes : si tu changes d'adresse (nom du dépôt,
+       nom de domaine…), remplace "https://ilanbs14.github.io/Liste/" partout dans ce bloc. -->
+  <link rel="canonical" href="https://ilanbs14.github.io/Liste/">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="fr_FR">
-  <meta property="og:title" content="Ma Liste de Noël">
-  <meta property="og:description" content="Déballe les paquets pour découvrir mes envies de Noël !">
-  <meta name="color-scheme" content="dark">
+  <meta property="og:site_name" content="Ma Liste de Noël">
+  <meta property="og:title" content="Ma Liste de Noël 🎄">
+  <meta property="og:description" content="Chut… ici se cachent mes plus beaux souhaits. Déballe les paquets pour les découvrir !">
+  <meta property="og:url" content="https://ilanbs14.github.io/Liste/">
+  <meta property="og:image" content="https://ilanbs14.github.io/Liste/assets/apercu.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Un village enneigé la nuit, un sapin décoré et le titre « Ma Liste de Noël ».">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Ma Liste de Noël 🎄">
+  <meta name="twitter:description" content="Chut… ici se cachent mes plus beaux souhaits. Déballe les paquets pour les découvrir !">
+  <meta name="twitter:image" content="https://ilanbs14.github.io/Liste/assets/apercu.jpg">
+
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 
   <link rel="preload" href="assets/fonts/mountains-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/nunito.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/scene.css">
   <link rel="stylesheet" href="css/ui.css">
+  <link rel="stylesheet" href="css/avent.css">
   <script>document.documentElement.className += ' js';</script>
+  <!-- Le contenu et le verrou sont chargés tout de suite : la page décide d'afficher le site (ou l'écran d'accès) avant le premier affichage -->
+  <script src="data/ma-liste.js"></script>
+  <script src="js/gate.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#liste">Aller directement à la liste</a>
@@ -26,6 +50,7 @@
   <!-- ============ DÉCOR DE FOND (fixe) ============ -->
   <div class="sky" aria-hidden="true">
     <div class="aurora"><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
+    <div class="aurora-show" id="aurora-show"></div>
     <div class="stars" id="stars"></div>
   </div>
   <canvas class="snow snow-back" id="snow-back" aria-hidden="true"></canvas>
@@ -33,6 +58,7 @@
   <div class="mood mood-grinch" id="mood-grinch" aria-hidden="true"></div>
   <div class="mood mood-disco" id="mood-disco" aria-hidden="true"></div>
   <div class="mood mood-blizzard" id="mood-blizzard" aria-hidden="true"></div>
+  <div class="mood mood-solstice" id="mood-solstice" aria-hidden="true"></div>
 
   <!-- ============ BARRE DU HAUT ============ -->
   <header class="topbar" id="topbar">
@@ -60,6 +86,21 @@
     </div>
   </header>
   <div class="garland" id="garland" aria-hidden="true"></div>
+
+  <!-- ============ ÉCRAN D'ACCÈS (visible seulement si le mot magique manque) ============ -->
+  <section class="gate" id="gate" aria-labelledby="gate-title">
+    <div class="gate-card">
+      <div class="gate-gift" id="gate-gift"></div>
+      <h1 class="gate-title" id="gate-title">Chut… c'est privé&nbsp;!</h1>
+      <p class="gate-text">Cette liste de Noël est réservée aux proches du Père Noël. Pour déballer le cadenas, il faut connaître le mot magique.</p>
+      <form class="gate-form" id="gate-form" autocomplete="off">
+        <label class="sr-only" for="gate-word">Le mot magique</label>
+        <input id="gate-word" type="text" placeholder="Le mot magique…" autocapitalize="none" autocorrect="off" spellcheck="false">
+        <button type="submit" class="btn btn-candy gate-btn"><span>Ouvrir</span></button>
+      </form>
+      <p class="gate-error" id="gate-error" role="alert" hidden>Hmm, ce n'est pas le bon mot… Le Père Noël te regarde de travers.</p>
+    </div>
+  </section>
 
   <main id="contenu">
     <!-- ============ HÉROS ============ -->
@@ -158,6 +199,12 @@
 
   <button type="button" class="to-top" id="to-top" aria-label="Remonter en haut" data-cursor-label="Hop, là-haut !"></button>
 
+  <!-- Calendrier de l'Avent : une animation spéciale chaque jour du 1er au 25 décembre -->
+  <button type="button" class="avent-btn" id="avent-btn" aria-label="Ouvrir le calendrier de l'Avent" data-cursor-label="Calendrier de l'Avent">
+    <span class="avent-ico" aria-hidden="true"></span>
+    <span class="avent-num" id="avent-num" aria-hidden="true"></span>
+  </button>
+
   <!-- ============ COUCHES AVANT (neige, effets, messages) ============ -->
   <canvas class="snow snow-front" id="snow-front" aria-hidden="true"></canvas>
   <div class="flight" id="flight" aria-hidden="true"></div>
@@ -165,12 +212,12 @@
   <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
   <!-- Carnet des secrets : un calque classique (et non un <dialog> natif) pour que notre curseur reste visible devant -->
-  <div class="secrets-overlay" id="secrets-overlay" hidden>
-    <div class="secrets-backdrop" id="secrets-backdrop"></div>
-    <section class="secrets" id="secrets-dialog" role="dialog" aria-modal="true" aria-labelledby="secrets-title" tabindex="-1">
+  <div class="overlay" id="secrets-overlay" hidden>
+    <div class="overlay-backdrop"></div>
+    <section class="overlay-panel secrets" id="secrets-dialog" role="dialog" aria-modal="true" aria-labelledby="secrets-title" tabindex="-1">
       <header class="secrets-head">
         <h2 id="secrets-title">Carnet des secrets</h2>
-        <button type="button" class="icon-btn" id="secrets-close" aria-label="Fermer le carnet">×</button>
+        <button type="button" class="icon-btn" id="secrets-close" data-close aria-label="Fermer le carnet">×</button>
       </header>
       <p class="secrets-intro">Le Père Noël a caché des surprises un peu partout sur ce site. Arriveras-tu à toutes les trouver&nbsp;?</p>
       <div class="secrets-progress">
@@ -184,21 +231,33 @@
     </section>
   </div>
 
+  <div class="overlay" id="avent-overlay" hidden>
+    <div class="overlay-backdrop"></div>
+    <section class="overlay-panel avent-panel" id="avent-dialog" role="dialog" aria-modal="true" aria-labelledby="avent-title" tabindex="-1">
+      <header class="secrets-head">
+        <h2 id="avent-title">Calendrier de l'Avent</h2>
+        <button type="button" class="icon-btn" id="avent-close" data-close aria-label="Fermer le calendrier">×</button>
+      </header>
+      <p class="secrets-intro" id="avent-intro"></p>
+      <ol class="avent-grid" id="avent-grid"></ol>
+    </section>
+  </div>
+
   <noscript>
     <p class="noscript">Ce site féerique a besoin de JavaScript pour que la magie opère. Active-le et reviens&nbsp;! 🎄</p>
   </noscript>
 
-  <!-- Contenu de la liste (le seul fichier à modifier) -->
-  <script src="data/ma-liste.js"></script>
-  <!-- Moteur du site -->
+  <!-- Moteur du site (le contenu de la liste et le verrou sont chargés dans le <head>) -->
   <script src="js/core.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/art.js"></script>
   <script src="js/fx.js"></script>
   <script src="js/cursor.js"></script>
   <script src="js/scene.js"></script>
+  <script src="js/feuille.js"></script>
   <script src="js/liste.js"></script>
   <script src="js/secrets.js"></script>
+  <script src="js/avent.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

@@ -5,8 +5,14 @@
    Comment ça marche ?
    -------------------
    1. "config"      → les textes du site (titre, prénom, petite lettre au Père Noël…)
+                      + (facultatif) l'adresse de ton Google Sheet : "feuille"
    2. "categories"  → les rayons de ta liste (ils deviennent des boutons de filtre)
    3. "cadeaux"     → TES cadeaux. Un bloc { ... } par cadeau.
+   4. "acces"       → le « mot magique » qui verrouille le site (voir plus bas)
+
+   💡 Tu préfères éditer ta liste dans un tableau Google Sheets ? Colle son adresse dans
+      config.feuille : les cadeaux ci-dessous ne servent alors plus que de secours.
+      (Mode d'emploi pas à pas dans le README.md)
 
    Champs d'un cadeau :
      nom          (obligatoire) Le nom du cadeau
@@ -14,8 +20,9 @@
      priorite     1 = petit plaisir · 2 = j'en rêve · 3 = LE cadeau de mes rêves
      prix         Un nombre, sans le symbole (ex. 59.9) — ou laisse vide
      lien         L'adresse de la page du produit — ou laisse vide
-     emoji        Un emoji pour illustrer (ex. "🎧")
-     image        (facultatif) L'adresse d'une photo, elle remplace l'emoji
+     emoji        Un emoji (ex. "🎧") OU l'adresse d'une photo du produit (ex. "https://…/casque.jpg",
+                  formats png, jpg, webp, gif, avif…). Une photo remplace l'emoji.
+     image        (facultatif) Pareil que "emoji" : l'adresse d'une photo
      description  Une phrase pour donner envie ou préciser
      note         Une précision pratique (taille, couleur, version…)
      reserve      true si quelqu'un s'en occupe déjà (le cadeau reçoit un tampon "Réservé")
@@ -32,15 +39,33 @@ window.NOEL = {
     prenom: "Ilan",        // sert à signer la lettre au Père Noël (laisse vide pour « Un enfant très sage »)
     devise: "EUR",         // "EUR", "USD", "CHF"…
 
+    // Google Sheets (facultatif) : colle ici le lien « Publier sur le Web → CSV » de ton tableau.
+    // Laisse vide ("") pour utiliser les cadeaux écrits dans ce fichier.
+    feuille: "https://docs.google.com/spreadsheets/d/1pU7vype3KF-H_8Flhl2P6_ih71GeT9ZraD6R_U0dIB4/edit?usp=sharing",
+
     // Affiche un bandeau « exemples » tant que ta vraie liste n'est pas en place.
     // → Mets false dès que tu as remplacé les cadeaux ci-dessous.
-    exemples: true,
+    exemples: false,
+
+    // 🎄 Calendrier de l'Avent : le bouton en bas à gauche + une animation spéciale chaque jour
+    // du 1er au 25 décembre. DÉSACTIVÉ pour l'instant (rien n'a été supprimé) :
+    // mets true pour le remettre.
+    avent: false,
 
     // La lettre qui ouvre la liste. Un texte par paragraphe.
     lettre: [
-      "Cette année, j'ai été (presque) toujours sage — surtout les jours où personne ne regardait.",
       "Voici ma petite liste. Clique sur un paquet pour le déballer et découvrir tous les détails. Merci pour tout, et joyeux Noël !"
     ]
+  },
+
+  // 🔒 Verrou léger : le site ne s'ouvre que si l'adresse se termine par  ?mot-magique
+  //    ex.  https://ilanbs14.github.io/Liste/?guimauve-givree
+  //    Le mot n'est PAS écrit ici, seulement son empreinte. Pour en changer, ouvre outils/mot-de-passe.html.
+  //    (Sécurité légère : elle écarte les curieux, pas un pirate. Voir le README.)
+  acces: {
+    actif: true,
+    hash: "b0de513baf253ac1e1d956d43b2a43fb6f20c5d01bf83e432657966e224b780e",
+    memoriser: true        // true : après un premier accès réussi, le lien sans mot marche sur cet appareil
   },
 
   categories: [

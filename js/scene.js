@@ -661,6 +661,24 @@
   /* ======================================================================
      Démarrage
      ====================================================================== */
+  /* Accès utilisés par les animations de l'Avent */
+  Scene.setGarlandMode = function (id) {
+    const i = MODES.findIndex((m) => m.id === id);
+    const box = $('#garland');
+    if (i < 0 || !box) return;
+    garlandMode = i;
+    box.dataset.mode = id;
+  };
+  Scene.getGarlandMode = () => MODES[garlandMode].id;
+  Scene.shootingStar = shootingStar;
+  Scene.say = say;
+
+  /** Écran d'accès : seulement le ciel étoilé (le reste du décor n'est pas construit) */
+  Scene.initGate = function () {
+    buildStars();
+    scheduleShooting();
+  };
+
   Scene.init = function () {
     buildStars();
     initGarland();

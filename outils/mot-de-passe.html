@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Changer le mot magique</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #f7fbff; background: linear-gradient(180deg, #050914, #121c52 70%, #1a2468); }
+    main { width: min(100%, 680px); padding: 28px; border-radius: 24px; background: rgba(15, 25, 70, .75); border: 1px solid rgba(255,255,255,.15); box-shadow: 0 30px 80px rgba(0,0,0,.45); }
+    h1 { margin: 0 0 .3rem; font-size: 1.7rem; color: #ffd166; }
+    p { margin: .5rem 0; color: #cfe3ff; }
+    label { display: block; margin: 1.2rem 0 .35rem; font-weight: 800; }
+    input { width: 100%; padding: .85rem 1rem; border-radius: 14px; border: 1.5px solid rgba(255,255,255,.25); background: rgba(255,255,255,.08); color: inherit; font: inherit; }
+    input:focus { outline: 3px solid #ffd166; outline-offset: 2px; }
+    .out { display: flex; gap: .5rem; align-items: stretch; }
+    .out input { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .85rem; }
+    button { padding: 0 1.1rem; border: 0; border-radius: 14px; background: #d62839; color: #fff; font: inherit; font-weight: 800; cursor: pointer; }
+    button:hover { background: #ef4357; }
+    code { padding: .1rem .4rem; border-radius: 6px; background: rgba(255,255,255,.12); }
+    .note { margin-top: 1.4rem; padding: .8rem 1rem; border-radius: 14px; background: rgba(255,209,102,.12); border: 1px dashed rgba(255,209,102,.5); font-size: .92rem; }
+    .ok { color: #7dffb0; min-height: 1.4em; font-weight: 700; }
+  </style>
+  <script src="../js/gate.js"></script>
+</head>
+<body>
+<main>
+  <h1>🔒 Changer le mot magique</h1>
+  <p>Tape le nouveau mot : la page calcule l'empreinte à coller dans <code>data/ma-liste.js</code> et le lien à partager.
+     Le mot n'est jamais envoyé nulle part, tout se passe dans ton navigateur.</p>
+
+  <label for="mot">Nouveau mot magique</label>
+  <input id="mot" type="text" value="guimauve-givree" autocomplete="off" spellcheck="false" autocapitalize="none">
+
+  <label for="hash">1. À coller dans <code>data/ma-liste.js</code> (ligne <code>hash</code> de <code>acces</code>)</label>
+  <div class="out"><input id="hash" readonly><button type="button" data-copy="hash">Copier</button></div>
+
+  <label for="base">2. Adresse de ton site</label>
+  <input id="base" type="text" value="https://ilanbs14.github.io/Liste/" spellcheck="false">
+
+  <label for="lien">3. Lien à envoyer à tes proches</label>
+  <div class="out"><input id="lien" readonly><button type="button" data-copy="lien">Copier</button></div>
+  <p class="ok" id="ok" role="status"></p>
+
+  <p class="note">Le mot ignore les majuscules, les accents et les tirets : « Guimauve Givrée » et « guimauve-givree » ouvrent la même porte.
+     Choisis un mot que personne ne devinerait. C'est une sécurité <strong>légère</strong> : elle écarte les curieux, pas un pirate.</p>
+</main>
+<script>
+  var $ = function (id) { return document.getElementById(id); };
+  function maj() {
+    var mot = $('mot').value.trim();
+    $('hash').value = mot ? window.NoelGate.hashMot(mot) : '';
+    var base = $('base').value.trim();
+    $('lien').value = mot ? base + (base.indexOf('?') < 0 ? '?' : '&') + encodeURIComponent(mot) : '';
+  }
+  ['mot', 'base'].forEach(function (id) { $(id).addEventListener('input', maj); });
+  document.querySelectorAll('[data-copy]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var el = $(b.getAttribute('data-copy'));
+      el.select();
+      var done = function () { $('ok').textContent = 'Copié ✔'; setTimeout(function () { $('ok').textContent = ''; }, 1800); };
+      if (navigator.clipboard) navigator.clipboard.writeText(el.value).then(done, function () { document.execCommand('copy'); done(); });
+      else { document.execCommand('copy'); done(); }
+    });
+  });
+  maj();
+</script>
+</body>
+</html>

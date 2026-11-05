@@ -1,5 +1,6 @@
 /* ==========================================================================
    LISTE — fabrique les paquets-cadeaux à partir de data/ma-liste.js
+   ou, si une feuille Google est indiquée, à partir de ce tableau en ligne
    ========================================================================== */
 (function () {
   'use strict';
@@ -13,8 +14,9 @@
   const CFG = DATA.config || {};
   const PRIO_LABEL = { 1: 'Un petit plaisir', 2: 'J\'en rêve un peu', 3: 'Le cadeau de mes rêves' };
 
-  const catById = {};
-  (DATA.categories || []).forEach((c) => { catById[c.id] = c; });
+  // Données actuellement affichées
+  let cur = { categories: [], cadeaux: [] };
+  let catById = {};
 
   const state = { cat: 'all', q: '', sort: 'original' };
   let cards = [];
@@ -22,6 +24,18 @@
 
   const T = (s) => esc(Noel.typo(s));
   const norm = (s) => String(s == null ? '' : s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+  /* ----------------------------------------------------------------------
+     Photos : un lien dans le champ « emoji » (ou « image ») devient la photo du produit
+     ---------------------------------------------------------------------- */
+  const IMG_RE = /^(https?:)?\/\/|^(\.{0,2}\/|assets\/|data:image\/)|\.(png|jpe?g|webp|gif|avif|svg|bmp)([?#].*)?$/i;
+  const isImg = (v) => typeof v === 'string' && IMG_RE.test(v.trim());
+  const secureUrl = (u) => {
+    u = u.trim();
+    // une page en https ne peut pas afficher une image en http : on tente la version sécurisée
+    return window.location.protocol === 'https:' && /^http:\/\//i.test(u) ? u.replace(/^http:/i, 'https:') : u;
+  };
+  Liste.isImageRef = isImg;
 
   function starsHtml(n) {
     let out = '<span class="rating" role="img" aria-label="' + esc(PRIO_LABEL[n]) + '" title="' + esc(PRIO_LABEL[n]) + '">';
@@ -39,9 +53,11 @@
     const th = Art.themes[cat.theme] || Art.themes.rouge;
     const prio = clamp(parseInt(g.priorite, 10) || 1, 1, 3);
     const price = Noel.fmtPrice(g.prix);
-    const icon = g.image
-      ? '<img src="' + esc(g.image) + '" alt="" loading="lazy">'
-      : '<span class="back-emoji">' + esc(g.emoji || cat.emoji || '🎁') + '</span>';
+    const photo = isImg(g.image) ? g.image : isImg(g.emoji) ? g.emoji : '';
+    const emoji = (!isImg(g.emoji) && g.emoji) || cat.emoji || '🎁';
+    const icon = photo
+      ? '<img src="' + esc(secureUrl(photo)) + '" alt="Photo : ' + esc(g.nom) + '" loading="lazy" decoding="async" referrerpolicy="no-referrer">'
+      : '<span class="back-emoji">' + esc(emoji) + '</span>';
     const tilt = (((i * 37) % 7) - 3) * 0.45;
 
     const el = document.createElement('article');
@@ -82,7 +98,7 @@
         '<div class="gift-face gift-back" role="group" aria-label="Détails : ' + esc(g.nom) + '">' +
           '<span class="tape" aria-hidden="true"></span>' +
           '<button type="button" class="back-close" aria-label="Refermer le paquet">×</button>' +
-          '<div class="back-ico">' + icon + '</div>' +
+          '<div class="back-ico' + (photo ? ' is-photo' : '') + '">' + icon + '</div>' +
           '<h3 class="back-title">' + T(g.nom) + '</h3>' +
           '<p class="back-cat">' + esc(cat.emoji || '') + ' ' + esc(cat.nom) + '</p>' +
           '<div class="back-body">' +
@@ -96,6 +112,16 @@
       '</div></div>';
 
     $$('[data-icon]', el).forEach((n) => { n.innerHTML = Art.icons[n.dataset.icon](); });
+
+    // photo introuvable (lien cassé, site qui bloque l'affichage…) : on retombe sur l'emoji
+    const img = $('.back-ico img', el);
+    if (img) {
+      img.addEventListener('error', () => {
+        const box = img.parentElement;
+        box.classList.remove('is-photo');
+        box.innerHTML = '<span class="back-emoji">' + esc(emoji) + '</span>';
+      }, { once: true });
+    }
     return el;
   }
 
@@ -196,13 +222,12 @@
     sorted(cards).forEach((c) => grid.appendChild(c.el));
 
     const visible = cards.filter((c) => !c.el.hidden);
+    emptyEl.classList.remove('is-loading');
     emptyEl.hidden = visible.length > 0;
     if (!visible.length) {
       emptyEl.innerHTML = cards.length
-        ? '<p class="empty-title">Aucun cadeau ne correspond…</p><p>Même le Grinch n\'a rien trouvé&nbsp;!</p><button type="button" class="btn btn-small btn-ghost" id="empty-reset">Tout afficher</button>'
+        ? '<p class="empty-title">Aucun cadeau ne correspond…</p><p>Même le Grinch n\'a rien trouvé&nbsp;!</p><button type="button" class="btn btn-small btn-ghost" data-empty-reset>Tout afficher</button>'
         : '<p class="empty-title">La liste est en cours d\'écriture…</p><p>Les lutins s\'appliquent. Reviens très bientôt&nbsp;!</p>';
-      const b = $('#empty-reset');
-      if (b) b.addEventListener('click', () => { resetFilters(); });
     }
     if (animate) {
       // on remet les cartes « hors scène » sans transition, puis on les fait entrer une à une
@@ -214,15 +239,19 @@
     updateCount();
   }
 
+  function setChipActive(id) {
+    $$('.chip').forEach((b) => {
+      const on = b.dataset.cat === id;
+      b.classList.toggle('is-active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+
   function resetFilters() {
     state.cat = 'all';
     state.q = '';
     $('#q').value = '';
-    $$('.chip').forEach((b) => {
-      const on = b.dataset.cat === 'all';
-      b.classList.toggle('is-active', on);
-      b.setAttribute('aria-pressed', on ? 'true' : 'false');
-    });
+    setChipActive('all');
     apply(true);
   }
 
@@ -230,25 +259,14 @@
     const box = $('#chips');
     const counts = {};
     cards.forEach((c) => { counts[c.data.categorie] = (counts[c.data.categorie] || 0) + 1; });
-    const used = (DATA.categories || []).filter((c) => counts[c.id]);
+    const used = (cur.categories || []).filter((c) => counts[c.id]);
     const all = [{ id: 'all', nom: 'Tous', emoji: '✨', n: cards.length }]
       .concat(used.map((c) => ({ id: c.id, nom: c.nom, emoji: c.emoji, n: counts[c.id] })));
-    box.innerHTML = all.map((c, i) =>
-      '<button type="button" class="chip' + (i === 0 ? ' is-active' : '') + '" data-cat="' + esc(c.id) + '" aria-pressed="' + (i === 0 ? 'true' : 'false') + '">' +
+    if (state.cat !== 'all' && !all.some((c) => c.id === state.cat)) state.cat = 'all';
+    box.innerHTML = all.map((c) =>
+      '<button type="button" class="chip' + (c.id === state.cat ? ' is-active' : '') + '" data-cat="' + esc(c.id) + '" aria-pressed="' + (c.id === state.cat ? 'true' : 'false') + '">' +
       '<span class="chip-emoji" aria-hidden="true">' + esc(c.emoji || '') + '</span>' + esc(c.nom) + ' <b>' + c.n + '</b></button>'
     ).join('');
-    box.addEventListener('click', (e) => {
-      const b = e.target.closest('.chip');
-      if (!b) return;
-      state.cat = b.dataset.cat;
-      $$('.chip', box).forEach((x) => {
-        const on = x === b;
-        x.classList.toggle('is-active', on);
-        x.setAttribute('aria-pressed', on ? 'true' : 'false');
-      });
-      Noel.audio.sparkle();
-      apply(true);
-    });
   }
 
   /* ----------------------------------------------------------------------
@@ -290,14 +308,17 @@
   }
 
   /* ----------------------------------------------------------------------
-     Démarrage
+     (Ré)affichage de toute la liste
      ---------------------------------------------------------------------- */
-  Liste.init = function () {
-    grid = $('#grid');
-    countEl = $('#count');
-    emptyEl = $('#empty');
+  function render(data, opts) {
+    const o = opts || {};
+    cur = { categories: data.categories || [], cadeaux: data.cadeaux || [] };
+    catById = {};
+    cur.categories.forEach((c) => { catById[c.id] = c; });
 
-    const items = (DATA.cadeaux || []).filter((g) => g && g.nom);
+    grid.innerHTML = '';
+    emptyEl.classList.remove('is-loading');
+    const items = cur.cadeaux.filter((g) => g && g.nom);
     cards = items.map((g, i) => {
       const el = buildCard(g, i);
       const cat = catById[g.categorie] || {};
@@ -334,30 +355,91 @@
     });
 
     buildChips();
-    buildLetter();
 
-    if (CFG.exemples) {
-      const b = $('#demo-banner');
-      b.hidden = false;
-      b.innerHTML = '<span class="demo-star">' + Art.icons.star() + '</span><span><b>Exemples.</b> Ces cadeaux sont là pour montrer le rendu : la vraie liste arrive très vite&nbsp;!</span>';
+    // Bandeau « exemples » : seulement pour les cadeaux d'exemple du fichier (jamais pour une vraie feuille)
+    const banner = $('#demo-banner');
+    if (CFG.exemples && o.from === 'local') {
+      banner.hidden = false;
+      banner.innerHTML = '<span class="demo-star">' + Art.icons.star() + '</span><span><b>Exemples.</b> Ces cadeaux sont là pour montrer le rendu : la vraie liste arrive très vite&nbsp;!</span>';
+    } else {
+      banner.hidden = true;
     }
 
-    $('#q').addEventListener('input', (e) => {
-      state.q = e.target.value;
-      apply(false);
+    $('#toolbar').hidden = !cards.length;
+    apply(false);
+    if (Noel.scene && Noel.scene.updateElfUI) Noel.scene.updateElfUI();
+    Noel.emit('liste', { count: cards.length, from: o.from });
+  }
+
+  function showLoading() {
+    $('#toolbar').hidden = true;
+    countEl.textContent = '';
+    emptyEl.hidden = false;
+    emptyEl.classList.add('is-loading');
+    emptyEl.innerHTML = '<div class="loading-gifts" aria-hidden="true"><i></i><i></i><i></i></div><p class="empty-title">Les lutins ouvrent la liste…</p>';
+  }
+
+  function showError() {
+    $('#toolbar').hidden = true;
+    countEl.textContent = '';
+    emptyEl.hidden = false;
+    emptyEl.classList.remove('is-loading');
+    emptyEl.innerHTML = '<p class="empty-title">Oups, la liste ne veut pas s\'ouvrir</p>' +
+      '<p>Le tableau en ligne est injoignable pour le moment. Vérifie ta connexion et réessaie.</p>' +
+      '<button type="button" class="btn btn-small btn-ghost" data-retry>Réessayer</button>';
+  }
+
+  /* ----------------------------------------------------------------------
+     Démarrage
+     ---------------------------------------------------------------------- */
+  function loadSheet(url, local, hadCache) {
+    return Noel.sheet.load(url, local.categories).then((data) => {
+      // si le tableau n'a pas changé depuis la copie déjà affichée, on ne touche à rien
+      if (!hadCache || JSON.stringify(hadCache) !== JSON.stringify(data)) render(data, { from: 'sheet' });
+    }).catch((err) => {
+      console.warn('[Noel] Google Sheet :', err && err.message ? err.message : err);
+      if (hadCache) return; // on garde la copie enregistrée, sans déranger personne
+      if (CFG.exemples || !local.cadeaux.length) showError();
+      else {
+        render(local, { from: 'local' });
+        Noel.toast('La liste en ligne est injoignable : voici la dernière version enregistrée.', { duration: 4500 });
+      }
     });
-    $('#sort').addEventListener('change', (e) => {
-      state.sort = e.target.value;
-      apply(true);
-    });
+  }
+
+  Liste.init = function () {
+    grid = $('#grid');
+    countEl = $('#count');
+    emptyEl = $('#empty');
+
+    // branchements faits une seule fois
+    buildLetter();
+    $('#q').addEventListener('input', (e) => { state.q = e.target.value; apply(false); });
+    $('#sort').addEventListener('change', (e) => { state.sort = e.target.value; apply(true); });
     $('#unwrap-all').addEventListener('click', unwrapAll);
     $('#wrap-all').addEventListener('click', wrapAll);
-    $('#toolbar').hidden = false;
+    $('#chips').addEventListener('click', (e) => {
+      const b = e.target.closest('.chip');
+      if (!b) return;
+      state.cat = b.dataset.cat;
+      setChipActive(state.cat);
+      Noel.audio.sparkle();
+      apply(true);
+    });
 
-    // Pas de liste : on masque les outils
-    if (!cards.length) $('#toolbar').hidden = true;
+    const local = { categories: DATA.categories || [], cadeaux: DATA.cadeaux || [] };
+    const url = (CFG.feuille || '').trim();
+    emptyEl.addEventListener('click', (e) => {
+      if (e.target.closest('[data-empty-reset]')) resetFilters();
+      if (e.target.closest('[data-retry]')) { showLoading(); loadSheet(url, local, null); }
+    });
 
-    apply(false);
+    if (!url || !Noel.sheet) { render(local, { from: 'local' }); return; }
+
+    // Google Sheet : on affiche tout de suite la copie enregistrée (s'il y en a une), puis on vérifie s'il y a du nouveau
+    const hadCache = Noel.sheet.cached(url);
+    if (hadCache) render(hadCache, { from: 'sheet' }); else showLoading();
+    loadSheet(url, local, hadCache);
   };
 
   Liste.cards = () => cards;

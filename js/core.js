@@ -145,6 +145,67 @@
     }
   };
 
+  /* ---------- Fenêtres (carnet des secrets, calendrier de l'Avent…) ----------
+     Ce sont des calques ordinaires, PAS des <dialog> en « couche supérieure » du navigateur :
+     celle-ci passerait au-dessus de notre curseur personnalisé. Restent accessibles : rôle dialog,
+     focus déplacé dedans, reste de la page « inerte », Échap et clic sur le fond pour fermer. */
+  Noel.modal = (function () {
+    const BEHIND = ['.skip-link', '#topbar', '#contenu', '.footer', '#to-top', '#avent-btn'];
+    let current = null;
+    let lastFocus = null;
+
+    const setInert = (on) => BEHIND.forEach((sel) => {
+      const el = document.querySelector(sel);
+      if (!el) return;
+      if (on) el.setAttribute('inert', ''); else el.removeAttribute('inert');
+    });
+
+    function onKey(e) {
+      if (e.key === 'Escape' && current) {
+        e.preventDefault();
+        e.stopPropagation();
+        close(current);
+      }
+    }
+
+    function bind(ov) {
+      const backdrop = ov.querySelector('.overlay-backdrop');
+      backdrop.addEventListener('click', () => close(ov));
+      // la page ne défile pas derrière le calque quand on tourne la molette sur le fond
+      backdrop.addEventListener('wheel', (e) => e.preventDefault(), { passive: false });
+      backdrop.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+      ov.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => close(ov)));
+    }
+
+    function open(ov, focusSel) {
+      if (!ov || !ov.hidden) return;
+      if (current && current !== ov) close(current);
+      current = ov;
+      lastFocus = document.activeElement;
+      ov.hidden = false;
+      setInert(true);
+      window.addEventListener('keydown', onKey, true);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        ov.classList.add('open');
+        const f = ov.querySelector(focusSel || '[data-close]');
+        if (f) f.focus({ preventScroll: true });
+      }));
+    }
+
+    function close(ov) {
+      if (!ov || ov.hidden) return;
+      ov.classList.remove('open');
+      setInert(false);
+      window.removeEventListener('keydown', onKey, true);
+      if (current === ov) current = null;
+      setTimeout(() => { if (!ov.classList.contains('open')) ov.hidden = true; }, 320);
+      if (lastFocus && document.contains(lastFocus) && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+      Noel.emit('modal-close', ov.id);
+    }
+
+    return { bind, open, close, isOpen: (ov) => !!ov && !ov.hidden };
+  })();
+
   /** Position (centre) d'un élément dans la fenêtre */
   Noel.centerOf = (el) => {
     const r = el.getBoundingClientRect();

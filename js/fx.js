@@ -113,6 +113,198 @@
         ctx.fillRect(-s * 0.32, -s * 0.68, s * 0.64, s * 0.18);
         break;
       }
+
+      /* ---- formes des animations de l'Avent ---- */
+      case 'snowflake': { // vrai flocon à 6 branches
+        const r = p.size / 2;
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = Math.max(1.3, r * 0.13);
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+          const a = (i * Math.PI) / 3, ca = Math.cos(a), sa = Math.sin(a);
+          ctx.moveTo(0, 0);
+          ctx.lineTo(ca * r, sa * r);
+          const bx = ca * r * 0.55, by = sa * r * 0.55;
+          for (const d of [0.65, -0.65]) {
+            ctx.moveTo(bx, by);
+            ctx.lineTo(bx + Math.cos(a + d) * r * 0.34, by + Math.sin(a + d) * r * 0.34);
+          }
+        }
+        ctx.stroke();
+        break;
+      }
+      case 'candy': { // canne en sucre
+        const s = p.size;
+        ctx.lineCap = 'round';
+        ctx.lineWidth = s * 0.22;
+        const path = () => {
+          ctx.beginPath();
+          ctx.moveTo(-s * 0.18, s * 0.5);
+          ctx.lineTo(-s * 0.18, -s * 0.12);
+          ctx.arc(0, -s * 0.12, s * 0.18, Math.PI, 0);
+          ctx.lineTo(s * 0.18, -s * 0.02);
+        };
+        ctx.strokeStyle = '#ffffff';
+        path(); ctx.stroke();
+        ctx.strokeStyle = '#d62839';
+        ctx.setLineDash([s * 0.12, s * 0.17]);
+        path(); ctx.stroke();
+        ctx.setLineDash([]);
+        break;
+      }
+      case 'bell': { // cloche dorée
+        const s = p.size;
+        ctx.fillStyle = p.color || '#ffd166';
+        ctx.beginPath();
+        ctx.moveTo(-s * 0.42, s * 0.28);
+        ctx.quadraticCurveTo(-s * 0.4, -s * 0.05, -s * 0.22, -s * 0.28);
+        ctx.quadraticCurveTo(0, -s * 0.55, s * 0.22, -s * 0.28);
+        ctx.quadraticCurveTo(s * 0.4, -s * 0.05, s * 0.42, s * 0.28);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillRect(-s * 0.46, s * 0.24, s * 0.92, s * 0.1);
+        ctx.fillStyle = '#b8821a';
+        ctx.beginPath(); ctx.arc(0, s * 0.42, s * 0.09, 0, 6.2832); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,.55)';
+        ctx.beginPath(); ctx.ellipse(-s * 0.14, -s * 0.08, s * 0.05, s * 0.14, 0.3, 0, 6.2832); ctx.fill();
+        break;
+      }
+      case 'gingerbread': { // bonhomme en pain d'épices
+        const s = p.size;
+        ctx.fillStyle = '#b9772f';
+        ctx.strokeStyle = '#b9772f';
+        ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.arc(0, -s * 0.32, s * 0.17, 0, 6.2832); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(0, s * 0.02, s * 0.17, s * 0.2, 0, 0, 6.2832); ctx.fill();
+        ctx.lineWidth = s * 0.14;
+        ctx.beginPath();
+        ctx.moveTo(-s * 0.12, -s * 0.06); ctx.lineTo(-s * 0.36, -s * 0.15);
+        ctx.moveTo(s * 0.12, -s * 0.06); ctx.lineTo(s * 0.36, -s * 0.15);
+        ctx.moveTo(-s * 0.07, s * 0.15); ctx.lineTo(-s * 0.2, s * 0.42);
+        ctx.moveTo(s * 0.07, s * 0.15); ctx.lineTo(s * 0.2, s * 0.42);
+        ctx.stroke();
+        ctx.fillStyle = '#ffffff';
+        for (const [ex, ey] of [[-0.06, -0.35], [0.06, -0.35]]) { ctx.beginPath(); ctx.arc(ex * s, ey * s, s * 0.027, 0, 6.2832); ctx.fill(); }
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = s * 0.03;
+        ctx.beginPath(); ctx.arc(0, -s * 0.3, s * 0.07, 0.2, Math.PI - 0.2); ctx.stroke();
+        ctx.fillStyle = '#d62839';
+        for (const by of [-0.04, 0.09]) { ctx.beginPath(); ctx.arc(0, by * s, s * 0.032, 0, 6.2832); ctx.fill(); }
+        break;
+      }
+      case 'cookie': { // biscuit aux pépites
+        const s = p.size / 2;
+        ctx.fillStyle = '#d9a15b';
+        ctx.beginPath(); ctx.arc(0, 0, s, 0, 6.2832); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,.25)';
+        ctx.beginPath(); ctx.arc(-s * 0.25, -s * 0.3, s * 0.45, 0, 6.2832); ctx.fill();
+        ctx.fillStyle = '#5a3418';
+        for (const [cx, cy, r] of [[-0.4, -0.2, 0.16], [0.3, -0.35, 0.14], [0.1, 0.15, 0.17], [-0.25, 0.42, 0.13], [0.45, 0.3, 0.13]]) {
+          ctx.beginPath(); ctx.arc(cx * s, cy * s, r * s, 0, 6.2832); ctx.fill();
+        }
+        break;
+      }
+      case 'tangerine': { // mandarine
+        const s = p.size / 2;
+        ctx.fillStyle = '#ff9f1c';
+        ctx.beginPath(); ctx.arc(0, 0, s, 0, 6.2832); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,.35)';
+        ctx.beginPath(); ctx.ellipse(-s * 0.35, -s * 0.35, s * 0.28, s * 0.18, -0.7, 0, 6.2832); ctx.fill();
+        ctx.fillStyle = '#2fa65a';
+        ctx.beginPath(); ctx.ellipse(s * 0.18, -s * 0.95, s * 0.34, s * 0.15, -0.5, 0, 6.2832); ctx.fill();
+        break;
+      }
+      case 'mitten': { // moufle
+        const s = p.size;
+        ctx.fillStyle = p.color || '#d62839';
+        ctx.beginPath();
+        ctx.moveTo(-s * 0.2, s * 0.5);
+        ctx.lineTo(-s * 0.22, -s * 0.05);
+        ctx.quadraticCurveTo(-s * 0.22, -s * 0.45, 0, -s * 0.45);
+        ctx.quadraticCurveTo(s * 0.22, -s * 0.45, s * 0.22, -s * 0.05);
+        ctx.lineTo(s * 0.2, s * 0.5);
+        ctx.closePath();
+        ctx.fill();
+        ctx.beginPath(); ctx.ellipse(s * 0.27, s * 0.08, s * 0.1, s * 0.17, -0.5, 0, 6.2832); ctx.fill();
+        ctx.fillStyle = '#f7fbff';
+        ctx.fillRect(-s * 0.24, s * 0.3, s * 0.48, s * 0.18);
+        break;
+      }
+      case 'hat': { // bonnet de Père Noël
+        const s = p.size;
+        ctx.fillStyle = '#d62839';
+        ctx.beginPath();
+        ctx.moveTo(-s * 0.4, s * 0.25);
+        ctx.quadraticCurveTo(-s * 0.35, -s * 0.35, s * 0.25, -s * 0.4);
+        ctx.quadraticCurveTo(s * 0.1, -s * 0.1, s * 0.4, s * 0.25);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(-s * 0.44, s * 0.2, s * 0.88, s * 0.16);
+        ctx.beginPath(); ctx.arc(s * 0.26, -s * 0.42, s * 0.1, 0, 6.2832); ctx.fill();
+        break;
+      }
+      case 'heart': {
+        const s = p.size / 2;
+        ctx.fillStyle = p.color || '#ff4d6d';
+        ctx.beginPath();
+        ctx.moveTo(0, s * 0.9);
+        ctx.bezierCurveTo(-s * 1.3, s * 0.1, -s * 0.7, -s * 0.9, 0, -s * 0.35);
+        ctx.bezierCurveTo(s * 0.7, -s * 0.9, s * 1.3, s * 0.1, 0, s * 0.9);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,.4)';
+        ctx.beginPath(); ctx.ellipse(-s * 0.4, -s * 0.2, s * 0.14, s * 0.22, -0.6, 0, 6.2832); ctx.fill();
+        break;
+      }
+      case 'holly': { // houx
+        const s = p.size;
+        ctx.fillStyle = '#1f9d55';
+        for (const sgn of [-1, 1]) {
+          ctx.beginPath(); ctx.ellipse(sgn * s * 0.26, -s * 0.04, s * 0.3, s * 0.13, sgn * -0.5, 0, 6.2832); ctx.fill();
+        }
+        ctx.fillStyle = '#d62839';
+        for (const [bx, by] of [[-0.07, 0.1], [0.08, 0.1], [0, 0.24]]) { ctx.beginPath(); ctx.arc(bx * s, by * s, s * 0.11, 0, 6.2832); ctx.fill(); }
+        ctx.fillStyle = 'rgba(255,255,255,.7)';
+        ctx.beginPath(); ctx.arc(-s * 0.1, 0.06 * s, s * 0.03, 0, 6.2832); ctx.fill();
+        break;
+      }
+      case 'bauble': { // boule de Noël (rebondit bien)
+        const s = p.size / 2;
+        ctx.fillStyle = '#e0a526';
+        ctx.fillRect(-s * 0.22, -s * 1.28, s * 0.44, s * 0.3);
+        ctx.fillStyle = p.color;
+        ctx.beginPath(); ctx.arc(0, 0, s, 0, 6.2832); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,.55)';
+        ctx.beginPath(); ctx.ellipse(-s * 0.35, -s * 0.38, s * 0.26, s * 0.16, -0.7, 0, 6.2832); ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = Math.max(1, s * 0.07);
+        ctx.beginPath(); ctx.arc(0, 0, s * 0.62, 0.3, 1.6); ctx.stroke();
+        break;
+      }
+      case 'lantern': { // lanterne lumineuse
+        const s = p.size;
+        const g = ctx.createRadialGradient(0, 0, 0, 0, 0, s * 1.5);
+        g.addColorStop(0, 'rgba(255,214,120,.9)');
+        g.addColorStop(0.4, 'rgba(255,150,50,.35)');
+        g.addColorStop(1, 'rgba(255,120,30,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(0, 0, s * 1.5, 0, 6.2832); ctx.fill();
+        ctx.fillStyle = 'rgba(255,170,60,.95)';
+        ctx.beginPath(); ctx.ellipse(0, 0, s * 0.42, s * 0.52, 0, 0, 6.2832); ctx.fill();
+        ctx.fillStyle = 'rgba(255,240,190,.9)';
+        ctx.beginPath(); ctx.ellipse(0, s * 0.04, s * 0.22, s * 0.32, 0, 0, 6.2832); ctx.fill();
+        ctx.fillStyle = '#7a3f10';
+        ctx.fillRect(-s * 0.24, -s * 0.56, s * 0.48, s * 0.09);
+        ctx.fillRect(-s * 0.2, s * 0.47, s * 0.4, s * 0.09);
+        break;
+      }
+      case 'snowball': {
+        const s = p.size / 2;
+        const g = ctx.createRadialGradient(-s * 0.3, -s * 0.3, 0, 0, 0, s);
+        g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#bcd2f5');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(0, 0, s, 0, 6.2832); ctx.fill();
+        break;
+      }
     }
   }
 
@@ -122,7 +314,7 @@
     for (let i = parts.length - 1; i >= 0; i--) {
       const p = parts[i];
       p.life -= dt;
-      if (p.life <= 0 || p.y > H + 60) {
+      if (p.life <= 0 || p.y > H + 80 || p.y < -160) {
         parts[i] = parts[parts.length - 1];
         parts.pop();
         continue;
@@ -134,12 +326,18 @@
       p.vy *= d;
       p.x += p.vx * dt;
       p.y += p.vy * dt;
+      if (p.sway) p.x += Math.sin(p.t * p.sf + p.sp) * p.sway * dt; // balancement des objets qui flottent
+      if (p.bounce && p.y > p.floor) {                              // rebond sur le bas de l'écran
+        p.y = p.floor;
+        if (Math.abs(p.vy) < 70) { p.vy = 0; p.vx *= 0.85; p.vr *= 0.8; }
+        else { p.vy = -p.vy * p.bounce; p.vx *= 0.94; p.vr *= 0.85; }
+      }
       p.rot += p.vr * dt;
       const k = p.life / p.max;
       ctx.save();
       ctx.translate(p.x, p.y);
       ctx.rotate(p.rot);
-      ctx.globalAlpha = Math.min(1, k * 2.4) * p.alpha;
+      ctx.globalAlpha = (p.nofade ? 1 : Math.min(1, k * 2.4)) * p.alpha;
       drawParticle(p, k);
       ctx.restore();
     }
@@ -232,6 +430,36 @@
             size: rand(3, 6), color: '#ff5a5a', shape: 'spark', life: rand(0.4, 0.7) });
         }
       }
+    },
+
+    /**
+     * Averse d'objets (flocons, bonbons, cœurs…) pendant `dur` ms.
+     * `rise: true` les fait monter du bas de l'écran. Renvoie une fonction pour l'arrêter.
+     */
+    shower(shape, opts) {
+      const o = Object.assign({
+        dur: 8000, rate: 6, colors: ['#ffffff'], size: [16, 26], vy: [60, 130], vx: [-18, 18],
+        g: 0, sway: 26, rise: false, life: 9, spin: 1.6, bounce: 0, floor: 0
+      }, opts);
+      const end = performance.now() + o.dur;
+      const spawn = () => {
+        const sz = rand(o.size[0], o.size[1]);
+        const speed = rand(o.vy[0], o.vy[1]);
+        add({
+          x: rand(-10, W + 10), y: o.rise ? H + 40 : -40, vx: rand(o.vx[0], o.vx[1]), vy: o.rise ? -speed : speed,
+          g: o.g, drag: 0, rot: rand(0, 6.28), vr: rand(-o.spin, o.spin), size: sz, color: pick(o.colors), shape,
+          // les objets qui tombent ou montent ne s'effacent pas : ils sortent de l'écran ; ceux qui rebondissent finissent par disparaître
+          life: o.bounce ? o.life : 40, nofade: !o.bounce, sway: o.sway, sf: rand(0.8, 2), sp: rand(0, 6.28),
+          bounce: o.bounce, floor: o.floor || H - sz * 0.6
+        });
+      };
+      const timer = setInterval(() => {
+        if (performance.now() > end) { clearInterval(timer); return; }
+        const n = o.rate * 0.12;
+        for (let i = 0; i < Math.floor(n); i++) spawn();
+        if (Math.random() < n % 1) spawn();
+      }, 120);
+      return () => clearInterval(timer);
     },
 
     /** Pluie de cadeaux / confettis pendant `ms` millisecondes */

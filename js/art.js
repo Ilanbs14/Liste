@@ -55,6 +55,7 @@
     arrow: () => `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`,
     pencil: () => `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4L16.500 4.500a2.100 2.100 0 0 1 3 3L8 19l-4 1z"/></svg>`,
     check: () => `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.500l4.500 4.500L19 7.500"/></svg>`,
+    door: () => `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="2.500" width="18" height="19" rx="3" fill="#d62839"/><rect x="5.500" y="5" width="13" height="14" rx="1.600" fill="#ffe08a"/><path d="M12 5v14" stroke="#e0a526" stroke-width="1.300"/><circle cx="14.600" cy="12.500" r="1" fill="#8f1022"/><path d="${starPath(8.800, 10, 2.600, 1.100)}" fill="#e0a526"/></svg>`,
     up: () => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${starPath(12, 12, 11, 4.8)}" fill="#ffd166" stroke="#e0a526" stroke-width="1" stroke-linejoin="round"/></svg>`,
     treeIcon: () => `<svg viewBox="0 0 32 36" aria-hidden="true"><rect x="13.500" y="28" width="5" height="7" rx="1" fill="#8a5a2b"/><path d="M16 5L7 16h4L4 25h24l-7-9h4z" fill="#1f9d55"/><path d="M16 5L11 12h10zM16 14L8 24h16z" fill="#2fbf6c" opacity=".55"/><path d="${starPath(16, 4, 4.200, 1.800)}" fill="#ffd166"/><circle cx="12" cy="20" r="1.500" fill="#ef4357"/><circle cx="20" cy="22" r="1.500" fill="#ffd166"/><circle cx="16" cy="13" r="1.200" fill="#4cc9f0"/></svg>`
   };
@@ -564,11 +565,74 @@
     candy:  { paper: '#f7fbff', paper2: '#d9e5f7', ribbon: '#d62839', ribbon2: '#9d1226', pat: 'candy',   fg: 'rgba(214,40,57,.30)' }
   };
 
+  /* ==========================================================================
+     ANIMATIONS DE L'AVENT : renne qui court, petit train
+     ========================================================================== */
+  /** Un renne qui galope (regarde vers la droite), prêt à être déplacé à l'écran */
+  function deerSvg(nose, phase) {
+    return `<svg class="deer-svg" viewBox="-4 -14 100 86" aria-hidden="true">${deerInner(PAL, !!nose, phase || 0)}</svg>`;
+  }
+
+  /** Petit train de Noël (locomotive + 3 wagons de cadeaux), regarde vers la droite */
+  function train() {
+    const wheel = (cx, cy, r, dur) => `
+      <g><animateTransform attributeName="transform" type="rotate" values="0 ${cx} ${cy};360 ${cx} ${cy}" dur="${dur}s" repeatCount="indefinite"/>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="#2a2f45"/><circle cx="${cx}" cy="${cy}" r="${r * 0.62}" fill="#ffd166"/>
+        <path d="M${cx - r * 0.62} ${cy}H${cx + r * 0.62}M${cx} ${cy - r * 0.62}V${cy + r * 0.62}" stroke="#2a2f45" stroke-width="2"/></g>`;
+    const wagon = (x, body, gift, ribbon) => `
+      <path d="M${x + 84} 78h18" stroke="#2a2f45" stroke-width="4" stroke-linecap="round"/>
+      <rect x="${x}" y="56" width="84" height="34" rx="5" fill="${body}"/>
+      <rect x="${x}" y="56" width="84" height="8" rx="4" fill="#fff" opacity=".28"/>
+      <rect x="${x + 6}" y="84" width="72" height="5" rx="2" fill="#000" opacity=".2"/>
+      <rect x="${x + 22}" y="32" width="38" height="26" rx="3" fill="${gift}"/>
+      <rect x="${x + 37}" y="32" width="8" height="26" fill="${ribbon}"/><rect x="${x + 22}" y="41" width="38" height="7" fill="${ribbon}"/>
+      <path d="M${x + 41} 32c-9-10-17-3-9 1zM${x + 41} 32c9-10 17-3 9 1z" fill="${ribbon}"/>
+      ${wheel(x + 18, 96, 9, 0.7)}${wheel(x + 66, 96, 9, 0.7)}`;
+    return `<svg class="train-svg" viewBox="0 0 480 116" aria-hidden="true">
+      ${wagon(6, '#2f6fd1', '#ee6a95', '#ffd166')}
+      ${wagon(114, '#e8b74f', '#1f9d55', '#f7fbff')}
+      ${wagon(222, '#7f43c4', '#d62839', '#ffd166')}
+      <path d="M330 78h6" stroke="#2a2f45" stroke-width="4" stroke-linecap="round"/>
+      <rect x="338" y="30" width="48" height="62" rx="6" fill="#8f1022"/>
+      <rect x="332" y="24" width="60" height="9" rx="4" fill="#ffd166"/>
+      <rect x="346" y="40" width="24" height="20" rx="3" fill="#bfe3ff"/><path d="M358 40v20M346 50h24" stroke="#8f1022" stroke-width="2"/>
+      <rect x="378" y="48" width="84" height="40" rx="16" fill="#d62839"/>
+      <rect x="388" y="48" width="8" height="40" fill="#ffd166"/><rect x="424" y="48" width="8" height="40" fill="#ffd166"/>
+      <rect x="440" y="30" width="16" height="24" rx="3" fill="#2a2f45"/><rect x="436" y="26" width="24" height="7" rx="3" fill="#ffd166"/>
+      <circle class="puff-t" cx="448" cy="22" r="7" fill="#e6eeff"/><circle class="puff-t p2" cx="448" cy="22" r="7" fill="#e6eeff"/><circle class="puff-t p3" cx="448" cy="22" r="7" fill="#e6eeff"/>
+      <circle cx="466" cy="68" r="6" fill="#fff2b0"/><circle cx="466" cy="68" r="13" fill="#fff2b0" opacity=".3"/>
+      <path d="M458 92l16 0-4-12z" fill="#2a2f45"/>
+      ${wheel(356, 96, 14, 0.9)}${wheel(400, 98, 11, 0.7)}${wheel(440, 98, 11, 0.7)}
+    </svg>`;
+  }
+
+  /* ==========================================================================
+     ÉCRAN D'ACCÈS : cadeau cadenassé
+     ========================================================================== */
+  function lockedGift() {
+    return `<svg class="locked-gift" viewBox="0 0 200 214" role="img" aria-label="Un cadeau fermé par un cadenas">
+      <ellipse cx="100" cy="202" rx="72" ry="9" fill="#000" opacity=".28"/>
+      <rect x="28" y="96" width="144" height="104" rx="9" fill="#d62839"/>
+      <rect x="28" y="96" width="46" height="104" rx="9" fill="#fff" opacity=".1"/>
+      <rect x="88" y="96" width="24" height="104" fill="#ffd166"/>
+      <rect x="18" y="68" width="164" height="36" rx="9" fill="#ef4357"/>
+      <rect x="88" y="68" width="24" height="36" fill="#ffe08a"/>
+      <svg x="48" y="10" width="104" height="74" viewBox="0 0 90 64">${bow().replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '')}</svg>
+      <g class="lock-body">
+        <path class="lock-shackle" d="M82 130v-16a18 18 0 0 1 36 0v16" fill="none" stroke="#e0a526" stroke-width="9" stroke-linecap="round"/>
+        <rect x="70" y="128" width="60" height="50" rx="11" fill="#ffd166"/>
+        <rect x="70" y="128" width="60" height="16" rx="8" fill="#fff" opacity=".35"/>
+        <circle cx="100" cy="150" r="7" fill="#8a5a2b"/><path d="M96.500 154h7l2 14h-11z" fill="#8a5a2b"/>
+      </g>
+    </svg>`;
+  }
+
   /* ---------- Export ---------- */
   Noel.art = {
     starPath, rng, icons, holly, bow, elf,
     giftSprite, sleighSprite, reindeerSprite,
     flight, tree, snowman, village, grinch,
+    deerSvg, train, lockedGift,
     pattern, themes
   };
 })();

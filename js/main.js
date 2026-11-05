@@ -99,10 +99,44 @@
     if (!Noel.finePointer) return;
     setTimeout(() => {
       Noel.toast('<b>Psst…</b> tu peux changer de curseur (cadeau, traîneau ou renne) en haut à droite.', { duration: 6000 });
-    }, 5500);
+    }, $("#avent-btn") && $("#avent-btn").classList.contains("has-new") ? 17000 : 5500);
+  }
+
+  /** Écran d'accès : le mot magique manque dans l'adresse. Rien du site n'est construit (ni la liste, ni les données en ligne). */
+  function startLocked() {
+    safe('ciel', Noel.scene.initGate);
+    safe('curseur-sprites', () => { Noel.cursor.set(Noel.cursor.kind, { silent: true }); });
+    safe('curseur', Noel.cursor.init);
+    const gift = $('#gate-gift');
+    const form = $('#gate-form');
+    const input = $('#gate-word');
+    const err = $('#gate-error');
+    gift.innerHTML = Art.lockedGift();
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const word = input.value.trim();
+      const ok = word && window.NoelGate && window.NoelGate.check(word);
+      if (ok) {
+        err.hidden = true;
+        gift.classList.add('open');
+        const r = gift.getBoundingClientRect();
+        Noel.fx.confetti(r.left + r.width / 2, r.top + r.height / 2, 60);
+        Noel.audio.chime();
+        // on recharge avec le mot dans l'adresse : le site s'ouvre (et retient l'accès si c'est autorisé)
+        setTimeout(() => { window.location.href = window.location.pathname + '?' + encodeURIComponent(word); }, 750);
+      } else {
+        err.hidden = false;
+        gift.classList.remove('nope'); void gift.offsetWidth; gift.classList.add('nope');
+        input.focus();
+        input.select();
+      }
+    });
+    setTimeout(() => input.focus({ preventScroll: true }), 600);
   }
 
   function start() {
+    if (window.NoelGate && window.NoelGate.locked) { startLocked(); return; }
     safe('config', applyConfig);
     safe('titre', () => Noel.scene.splitLetters($('#title')));
     safe('curseur-sprites', () => { Noel.cursor.set(Noel.cursor.kind, { silent: true }); });
@@ -111,6 +145,7 @@
     safe('décor', Noel.scene.init);
     safe('liste', Noel.liste.init);
     safe('secrets', Noel.secrets.init);
+    safe('avent', Noel.avent.init);
     safe('outils', bindTools);
     safe('clics', bindClickFx);
     safe('cta', bindCta);

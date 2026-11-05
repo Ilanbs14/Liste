@@ -93,52 +93,14 @@
     }).join('');
   }
 
-  /* Le carnet est un calque ordinaire (pas un <dialog> en « couche supérieure » du navigateur),
-     sinon notre curseur personnalisé passerait derrière. Il reste accessible : rôle dialog,
-     focus déplacé dedans, reste de la page « inerte », Échap pour fermer. */
-  const BEHIND = ['.skip-link', '#topbar', '#contenu', '.footer', '#to-top'];
-  let lastFocus = null;
-
-  function setBehindInert(on) {
-    BEHIND.forEach((sel) => {
-      const el = $(sel);
-      if (!el) return;
-      if (on) el.setAttribute('inert', ''); else el.removeAttribute('inert');
-    });
-  }
-
-  function onPanelKey(e) {
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      e.stopPropagation();
-      Secrets.closePanel();
-    }
-  }
-
+  /* Le carnet est une fenêtre gérée par Noel.modal (voir core.js) : le curseur reste devant. */
   Secrets.openPanel = function () {
-    const ov = $('#secrets-overlay');
-    if (!ov || !ov.hidden) return;
-    lastFocus = document.activeElement;
     renderList();
     updateUI();
-    ov.hidden = false;
-    setBehindInert(true);
-    window.addEventListener('keydown', onPanelKey, true);
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      ov.classList.add('open');
-      const close = $('#secrets-close');
-      if (close) close.focus({ preventScroll: true });
-    }));
+    Noel.modal.open($('#secrets-overlay'), '#secrets-close');
   };
-
   Secrets.closePanel = function () {
-    const ov = $('#secrets-overlay');
-    if (!ov || ov.hidden) return;
-    ov.classList.remove('open');
-    setBehindInert(false);
-    window.removeEventListener('keydown', onPanelKey, true);
-    setTimeout(() => { if (!ov.classList.contains('open')) ov.hidden = true; }, 320);
-    if (lastFocus && document.contains(lastFocus) && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+    Noel.modal.close($('#secrets-overlay'));
   };
 
   /* ---------- Les effets ---------- */
@@ -248,12 +210,7 @@
   };
 
   Secrets.init = function () {
-    const backdrop = $('#secrets-backdrop');
-    backdrop.addEventListener('click', () => Secrets.closePanel());
-    // on ne laisse pas la page défiler derrière le carnet quand on tourne la molette sur le fond
-    backdrop.addEventListener('wheel', (e) => e.preventDefault(), { passive: false });
-    backdrop.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
-    $('#secrets-close').addEventListener('click', () => Secrets.closePanel());
+    Noel.modal.bind($('#secrets-overlay'));
     $('#secrets-reset').addEventListener('click', () => {
       if (window.confirm('Effacer tous les secrets découverts et les lutins retrouvés ?')) Secrets.reset();
     });
