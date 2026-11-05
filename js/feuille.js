@@ -67,7 +67,8 @@
     emoji: ['emoji', 'emojiouphoto', 'photo', 'image', 'illustration', 'visuel', 'emojiimage'],
     description: ['description', 'desc', 'details', 'detail', 'commentaire'],
     note: ['note', 'precision', 'precisions', 'remarque'],
-    reserve: ['reserve', 'reservee', 'pris', 'statut']
+    reserve: ['reserve', 'reservee', 'pris', 'statut'],
+    couleur: ['couleur', 'papier', 'emballage']        // facultatif : force la couleur de l'emballage (rouge, vert, bleu, violet, or, rose, candy)
   };
 
   function mapHeader(cells) {
@@ -160,7 +161,8 @@
         lien: get(r, 'lien'),
         emoji: get(r, 'emoji'),            // un emoji OU l'adresse d'une photo (liste.js fait la différence)
         description: get(r, 'description'),
-        note: get(r, 'note')
+        note: get(r, 'note'),
+        couleur: get(r, 'couleur')
       };
       if (parseBool(get(r, 'reserve'))) g.reserve = true;
       cadeaux.push(g);

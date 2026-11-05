@@ -212,6 +212,61 @@
     }
   }
 
+  /* ----------------------------------------------------------------------
+     Couleurs des emballages
+     ----------------------------------------------------------------------
+     config.couleurs :  "alterne" (par défaut) → les couleurs se suivent dans l'ordre d'affichage, deux voisins n'ont jamais la même
+                        ["rouge", "vert", "or"] → on alterne seulement ces couleurs
+                        "categorie"            → la couleur dépend de la catégorie
+     Un cadeau peut forcer sa couleur avec le champ « couleur » (ex. couleur: "rose"), dans le fichier comme dans le Google Sheet. */
+  const ALL_THEMES = ['rouge', 'vert', 'bleu', 'or', 'rose', 'violet', 'candy'];
+  const THEME_ALIASES = { mauve: 'violet', dore: 'or', doree: 'or', jaune: 'or', orange: 'or', blanc: 'candy', blanche: 'candy', sucre: 'candy', rouges: 'rouge' };
+  function themeName(v) {
+    const k = norm(v).replace(/[^a-z]/g, '');
+    if (!k) return null;
+    if (Art.themes[k]) return k;
+    return THEME_ALIASES[k] && Art.themes[THEME_ALIASES[k]] ? THEME_ALIASES[k] : null;
+  }
+
+  function paint(c, name) {
+    const th = Art.themes[name] || Art.themes.rouge;
+    if (c.themeName === name) return;
+    c.themeName = name;
+    c.theme = th;
+    const s = c.el.style;
+    s.setProperty('--paper', th.paper);
+    s.setProperty('--paper2', th.paper2);
+    s.setProperty('--ribbon', th.ribbon);
+    s.setProperty('--ribbon2', th.ribbon2);
+    s.setProperty('--pat', Art.pattern(th.pat, th.fg));
+    const bow = $('.bow', c.el);
+    if (bow) bow.innerHTML = Art.bow(th.ribbon, th.ribbon2);
+  }
+
+  function applyColors(visibleInOrder) {
+    const mode = CFG.couleurs;
+    const byCategory = mode === 'categorie';
+    const custom = Array.isArray(mode) ? mode.map(themeName).filter(Boolean) : [];
+    const list = custom.length ? custom : ALL_THEMES;
+    let k = 0, prev = null;
+    visibleInOrder.forEach((c, i) => {
+      let name;
+      if (c.override) name = c.override;
+      else if (byCategory) name = c.catTheme;
+      else {
+        // jamais deux emballages identiques côte à côte (on évite aussi la couleur forcée du cadeau suivant)
+        const next = visibleInOrder[i + 1] && visibleInOrder[i + 1].override;
+        let guard = 0;
+        while (list.length > 2 && guard++ < list.length && (list[k % list.length] === prev || list[k % list.length] === next)) k++;
+        if (list.length === 2 && list[k % 2] === prev) k++;
+        name = list[k % list.length];
+        k++;
+      }
+      paint(c, name);
+      prev = name;
+    });
+  }
+
   function apply(animate) {
     const q = norm(state.q.trim());
     cards.forEach((c) => {
@@ -219,7 +274,9 @@
       const okQ = !q || c.hay.indexOf(q) >= 0;
       c.el.hidden = !(okCat && okQ);
     });
-    sorted(cards).forEach((c) => grid.appendChild(c.el));
+    const order = sorted(cards);
+    order.forEach((c) => grid.appendChild(c.el));
+    applyColors(order.filter((c) => !c.el.hidden));
 
     const visible = cards.filter((c) => !c.el.hidden);
     emptyEl.classList.remove('is-loading');
@@ -326,6 +383,9 @@
         el, data: g, idx: i,
         prio: clamp(parseInt(g.priorite, 10) || 1, 1, 3),
         theme: Art.themes[cat.theme] || Art.themes.rouge,
+        themeName: Art.themes[cat.theme] ? cat.theme : 'rouge',
+        catTheme: Art.themes[cat.theme] ? cat.theme : 'rouge',
+        override: themeName(g.couleur),
         front: $('.gift-front', el),
         hay: norm([g.nom, g.description, g.note, cat.nom].join(' '))
       };

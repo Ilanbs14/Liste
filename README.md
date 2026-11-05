@@ -54,6 +54,7 @@ Tout est dans **[`data/ma-liste.js`](data/ma-liste.js)**, avec les explications 
 | `description` | Une phrase pour donner envie                                                  |
 | `note`        | Une précision pratique : taille, couleur, version…                            |
 | `reserve`     | `true` si quelqu'un s'en occupe déjà (tampon « Réservé »)                     |
+| `couleur`     | (facultatif) force la couleur de l'emballage de ce cadeau (voir [les couleurs](#couleurs-des-emballages)) |
 
 Quand la vraie liste est en place, passe `exemples` à `false` dans `config` pour retirer le bandeau « Exemples ».
 Thèmes de papier cadeau pour les catégories : `rouge`, `vert`, `bleu`, `violet`, `or`, `rose`, `candy`.
@@ -83,6 +84,7 @@ Comment remplir le tableau :
 - **Priorité** : `1`, `2`, `3` ou des étoiles (`⭐⭐⭐`).
 - **Prix** : `129,90`, `129.90`, `129,90 €`… tout est compris.
 - **Réservé** : `oui` (ou `x`, `✓`, `1`) pour poser le tampon.
+- **Couleur** (colonne facultative `couleur`) : `rouge`, `vert`, `bleu`, `violet`, `or`, `rose` ou `candy` pour forcer l'emballage d'un cadeau. Laisse vide pour l'alternance automatique.
 - Une ligne qui commence par `#` est ignorée (pratique pour mettre un commentaire).
 - Si le tableau est injoignable, le site affiche la dernière version qu'il a mémorisée sur l'appareil du visiteur.
 
@@ -97,6 +99,18 @@ Dans la colonne/le champ **emoji**, mets l'adresse d'une image au lieu d'un emoj
 - Les liens de partage Google Drive / Dropbox / Pinterest ne sont pas des liens directs vers l'image.
 - Tu peux aussi déposer tes photos dans le dossier `assets/` et écrire `assets/casque.jpg`.
 - Si une photo ne se charge pas (lien cassé, site qui bloque l'affichage), le site affiche l'emoji de la catégorie à la place.
+
+## Couleurs des emballages
+
+Réglage `couleurs` dans la section `config` de `data/ma-liste.js` :
+
+| Valeur | Effet |
+| --- | --- |
+| `"alterne"` (par défaut) | les couleurs se suivent dans l'ordre d'affichage (rouge, vert, bleu, or, rose, violet, blanc rayé) ; deux voisins n'ont jamais la même, même après un tri ou un filtre |
+| `["rouge", "vert", "or"]` | on alterne seulement ces couleurs |
+| `"categorie"` | la couleur dépend de la catégorie (champ `theme` des catégories de `data/ma-liste.js` ; une catégorie créée par le Google Sheet reçoit une couleur dans l'ordre d'apparition) |
+
+Dans tous les cas, un cadeau peut imposer sa couleur avec le champ (ou la colonne) `couleur`.
 
 ## Mettre le site en ligne (GitHub Pages)
 

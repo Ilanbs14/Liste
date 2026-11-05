@@ -26,6 +26,7 @@
      description  Une phrase pour donner envie ou préciser
      note         Une précision pratique (taille, couleur, version…)
      reserve      true si quelqu'un s'en occupe déjà (le cadeau reçoit un tampon "Réservé")
+     couleur      (facultatif) force la couleur de l'emballage de CE cadeau : "rouge", "vert", "bleu", "violet", "or", "rose" ou "candy"
 
    Thèmes de papier cadeau pour les catégories :
      "rouge" · "vert" · "bleu" · "violet" · "or" · "rose" · "candy"
@@ -46,6 +47,12 @@ window.NOEL = {
     // Affiche un bandeau « exemples » tant que ta vraie liste n'est pas en place.
     // → Mets false dès que tu as remplacé les cadeaux ci-dessous.
     exemples: false,
+
+    // Couleurs des emballages :
+    //   "alterne"   → les couleurs se suivent dans l'ordre d'affichage (jamais deux pareils côte à côte)
+    //   ["rouge", "vert", "or"] → alterne seulement ces couleurs (choix : rouge, vert, bleu, violet, or, rose, candy)
+    //   "categorie" → la couleur dépend de la catégorie (voir "theme" de chaque catégorie plus bas)
+    couleurs: "alterne",
 
     // 🎄 Calendrier de l'Avent : le bouton en bas à gauche + une animation spéciale chaque jour
     // du 1er au 25 décembre. DÉSACTIVÉ pour l'instant (rien n'a été supprimé) :
