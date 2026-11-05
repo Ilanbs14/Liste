@@ -1,0 +1,259 @@
+/* ==========================================================================
+   SCENE — ciel étoilé, aurore, neige, village, sapin, guirlande, traîneau
+   ========================================================================== */
+
+/* ---------- Ciel (fixe, derrière tout) ---------- */
+.sky { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+
+.aurora { position: absolute; left: 0; right: 0; top: 0; height: 75vh; mix-blend-mode: screen; }
+.aurora i { position: absolute; border-radius: 50%; will-change: transform, opacity; }
+.aurora .a1 {
+  left: -12%; top: -14%; width: 72vw; height: 58vh;
+  background: radial-gradient(ellipse at 50% 50%, rgba(61, 220, 151, .42), rgba(61, 220, 151, 0) 68%);
+  animation: aur1 22s ease-in-out infinite alternate;
+}
+.aurora .a2 {
+  right: -16%; top: -8%; width: 78vw; height: 52vh;
+  background: radial-gradient(ellipse at 50% 50%, rgba(76, 201, 240, .34), rgba(76, 201, 240, 0) 68%);
+  animation: aur2 28s ease-in-out infinite alternate;
+}
+.aurora .a3 {
+  left: 18%; top: 2%; width: 62vw; height: 46vh;
+  background: radial-gradient(ellipse at 50% 50%, rgba(199, 125, 255, .3), rgba(199, 125, 255, 0) 68%);
+  animation: aur3 34s ease-in-out infinite alternate;
+}
+@keyframes aur1 { 0% { transform: translate3d(-6%, 0, 0) scale(1, .9) rotate(-5deg); opacity: .5; } 100% { transform: translate3d(12%, 7%, 0) scale(1.2, 1.1) rotate(7deg); opacity: 1; } }
+@keyframes aur2 { 0% { transform: translate3d(8%, 2%, 0) scale(1.1, 1) rotate(4deg); opacity: .9; } 100% { transform: translate3d(-12%, 8%, 0) scale(.9, 1.2) rotate(-6deg); opacity: .45; } }
+@keyframes aur3 { 0% { transform: translate3d(-10%, 4%, 0) scale(1, 1) rotate(3deg); opacity: .4; } 100% { transform: translate3d(14%, -2%, 0) scale(1.25, .95) rotate(-4deg); opacity: .95; } }
+
+.stars { position: absolute; inset: 0; }
+.stars i {
+  position: absolute; border-radius: 50%; background: #fff;
+  opacity: var(--o, .8);
+  animation: twinkle var(--d, 4s) ease-in-out infinite;
+}
+.stars i.big { box-shadow: 0 0 8px 2px rgba(255, 255, 255, .55); background: #fffbe6; }
+@keyframes twinkle {
+  0%, 100% { opacity: var(--o, .8); transform: scale(1); }
+  50% { opacity: .12; transform: scale(.65); }
+}
+
+/* ---------- Neige (deux couches) ---------- */
+.snow { position: fixed; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+.snow-back { z-index: 1; }
+.snow-front { z-index: 40; }
+
+/* Canvas des particules : au-dessus de tout, sans gêner les clics */
+#fx { position: fixed; left: 0; top: 0; width: 100%; height: 100%; z-index: 60; pointer-events: none; }
+
+main, .footer { position: relative; z-index: 2; }
+
+/* ---------- Ambiances (easter eggs) ---------- */
+.mood { position: fixed; inset: 0; pointer-events: none; opacity: 0; transition: opacity .9s ease; }
+.mood.on { opacity: 1; }
+.mood-grinch { z-index: 45; background: #35ff72; mix-blend-mode: color; }
+.mood-grinch.on { opacity: .55; }
+.mood-disco {
+  z-index: 44; mix-blend-mode: screen;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255, 77, 109, .34), transparent 46%),
+    radial-gradient(circle at 88% 14%, rgba(76, 201, 240, .34), transparent 46%),
+    radial-gradient(circle at 50% 96%, rgba(255, 209, 102, .3), transparent 52%);
+}
+.mood-disco.on { animation: disco-hue .9s linear infinite; }
+@keyframes disco-hue { from { filter: hue-rotate(0deg); } to { filter: hue-rotate(360deg); } }
+.mood-blizzard {
+  z-index: 46;
+  background: radial-gradient(ellipse at 50% 45%, rgba(255, 255, 255, 0) 28%, rgba(222, 236, 255, .5) 100%);
+}
+
+.rudolph-glow {
+  position: fixed; left: 0; top: 0; width: 560px; height: 560px; margin: -280px 0 0 -280px;
+  z-index: 44; pointer-events: none; border-radius: 50%; mix-blend-mode: screen;
+  background: radial-gradient(circle, rgba(255, 70, 70, .55) 0%, rgba(255, 40, 40, .22) 30%, rgba(255, 40, 40, 0) 66%);
+  opacity: 0; transition: opacity .7s ease; will-change: transform;
+}
+.rudolph-glow.on { opacity: 1; animation: nose-flicker 1.4s ease-in-out infinite alternate; }
+@keyframes nose-flicker { from { opacity: .75; } to { opacity: 1; } }
+
+/* ---------- Lune ---------- */
+.moon {
+  position: absolute; z-index: 3;
+  top: calc(var(--header-h) + clamp(52px, 8vh, 96px)); right: clamp(18px, 9vw, 160px);
+  width: clamp(70px, 9vw, 128px); aspect-ratio: 1; border-radius: 50%; overflow: hidden;
+  background: radial-gradient(circle at 34% 30%, #fffef5 0%, #fff3c9 48%, #f1d98c 100%);
+  box-shadow: 0 0 40px 8px rgba(255, 244, 200, .38), 0 0 120px 40px rgba(255, 240, 190, .2);
+  animation: moon-glow 6s ease-in-out infinite alternate;
+  will-change: transform;
+}
+.moon::before {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background:
+    radial-gradient(circle at 62% 28%, rgba(160, 140, 90, .30) 0 9%, transparent 10%),
+    radial-gradient(circle at 30% 62%, rgba(160, 140, 90, .26) 0 12%, transparent 13%),
+    radial-gradient(circle at 72% 72%, rgba(160, 140, 90, .22) 0 7%, transparent 8%),
+    radial-gradient(circle at 44% 42%, rgba(160, 140, 90, .16) 0 5%, transparent 6%);
+}
+@keyframes moon-glow { from { box-shadow: 0 0 36px 6px rgba(255, 244, 200, .3), 0 0 110px 36px rgba(255, 240, 190, .15); } to { box-shadow: 0 0 48px 12px rgba(255, 244, 200, .46), 0 0 140px 50px rgba(255, 240, 190, .24); } }
+.moon-sil { position: absolute; inset: 0; display: block; }
+.moon-sil svg { position: absolute; left: 0; top: 22%; width: 150%; max-width: none; transform: translateX(-130%); }
+.moon-sil.go svg { animation: moon-pass 3.4s ease-in-out forwards; }
+@keyframes moon-pass { 0% { transform: translateX(-130%) rotate(7deg); } 100% { transform: translateX(110%) rotate(-7deg); } }
+
+/* ---------- Scène du bas de page d'accueil ---------- */
+.scene { position: absolute; left: 0; right: 0; bottom: 0; height: clamp(260px, 46vh, 520px); pointer-events: none; z-index: 2; }
+.layer { position: absolute; left: -3%; right: -3%; bottom: 0; height: 100%; will-change: transform;
+  -webkit-mask-image: linear-gradient(to bottom, #000 90%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 90%, transparent 100%);
+}
+.village-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.layer .elf-g, .layer [data-elf] { pointer-events: auto; }
+
+/* Les cadres du sapin et du bonhomme de neige ne captent pas les clics : seules leurs formes dessinées le font
+   (sinon leurs coins vides bloqueraient ce qui se trouve derrière, comme un lutin sur un toit). */
+.prop { position: absolute; pointer-events: none; will-change: transform; }
+.prop svg * { pointer-events: auto; }
+.prop-tree { right: clamp(6px, 6vw, 130px); bottom: 12%; width: clamp(140px, min(21vw, 38vh), 330px); }
+.prop-snowman { left: clamp(6px, 7vw, 150px); bottom: 11.5%; width: clamp(92px, min(12.5vw, 23vh), 190px); }
+.prop > svg { width: 100%; height: auto; overflow: visible; }
+.tree-svg, .snowman-svg { filter: drop-shadow(0 12px 18px rgba(0, 0, 0, .4)); }
+
+/* Village */
+.win { animation: win-flicker 7s ease-in-out infinite; }
+@keyframes win-flicker { 0%, 100% { opacity: 1; } 44% { opacity: .92; } 47% { opacity: .6; } 50% { opacity: 1; } 80% { opacity: .85; } }
+.puff { fill: #cfdaf7; opacity: 0; transform-box: fill-box; transform-origin: center; animation: puff 5.2s ease-out infinite; }
+@keyframes puff { 0% { opacity: 0; transform: translate(0, 0) scale(.5); } 12% { opacity: .55; } 100% { opacity: 0; transform: translate(18px, -56px) scale(2.5); } }
+.bl { animation: bl 1.8s ease-in-out infinite; }
+@keyframes bl { 0%, 100% { opacity: 1; } 50% { opacity: .22; } }
+.sp { animation: dot-twinkle 3.4s ease-in-out infinite; }
+@keyframes dot-twinkle { 0%, 100% { opacity: .12; } 50% { opacity: .95; } }
+
+/* Sapin */
+.tree-svg { cursor: pointer; transform-origin: 50% 100%; }
+.tree-svg.shake { animation: tree-shake .85s ease-in-out; }
+@keyframes tree-shake { 0%, 100% { transform: rotate(0); } 15% { transform: rotate(-3.2deg); } 30% { transform: rotate(2.8deg); } 45% { transform: rotate(-2.2deg); } 60% { transform: rotate(1.5deg); } 80% { transform: rotate(-.6deg); } }
+.lt { animation: lt 2.4s ease-in-out var(--d, 0s) infinite; }
+@keyframes lt { 0%, 100% { opacity: 1; } 50% { opacity: .18; } }
+.bb { transform-box: fill-box; transform-origin: 50% 0; animation: bb-sway 4.8s ease-in-out infinite alternate; cursor: pointer; outline: none; transition: filter .2s; }
+.bb:hover, .bb:focus-visible { filter: brightness(1.3) drop-shadow(0 0 5px rgba(255, 255, 255, .8)); }
+.bb.ring { animation: bb-ring .9s ease-out; }
+@keyframes bb-sway { from { transform: rotate(-3.5deg); } to { transform: rotate(3.5deg); } }
+@keyframes bb-ring { 0% { transform: rotate(0); } 15% { transform: rotate(18deg) scale(1.2); } 35% { transform: rotate(-13deg) scale(1.1); } 55% { transform: rotate(7deg); } 75% { transform: rotate(-3deg); } 100% { transform: rotate(0); } }
+.treestar { transform-box: fill-box; transform-origin: 50% 50%; animation: star-pulse 2.6s ease-in-out infinite; cursor: pointer; outline: none; }
+.treestar.wish { animation: star-wish 1.1s ease-out; }
+@keyframes star-pulse { 0%, 100% { transform: scale(1) rotate(0); } 50% { transform: scale(1.12) rotate(6deg); } }
+@keyframes star-wish { 0% { transform: scale(1); } 30% { transform: scale(1.8) rotate(40deg); } 100% { transform: scale(1) rotate(0); } }
+.star-halo { animation: halo 2.6s ease-in-out infinite; }
+@keyframes halo { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+
+/* Bonhomme de neige */
+.snowman-svg { cursor: pointer; transform-origin: 50% 100%; animation: sn-sway 6s ease-in-out infinite alternate; }
+.snowman-svg.hop { animation: sn-hop .65s var(--ease-pop); }
+@keyframes sn-sway { from { transform: rotate(-1.2deg); } to { transform: rotate(1.2deg); } }
+@keyframes sn-hop { 0% { transform: translateY(0) scale(1, 1); } 25% { transform: translateY(0) scale(1.08, .9); } 55% { transform: translateY(-24px) scale(.95, 1.06); } 100% { transform: translateY(0) scale(1); } }
+.sn-arm-r { transform-box: fill-box; transform-origin: 0% 100%; animation: sn-wave 4.5s ease-in-out infinite; }
+@keyframes sn-wave { 0%, 58%, 100% { transform: rotate(0); } 66% { transform: rotate(-16deg); } 74% { transform: rotate(8deg); } 82% { transform: rotate(-12deg); } 90% { transform: rotate(4deg); } }
+.snowman-svg:hover .sn-arm-r { animation-duration: .8s; }
+.sn-tail { transform-box: fill-box; transform-origin: 0 0; animation: scarf 3s ease-in-out infinite alternate; }
+@keyframes scarf { from { transform: rotate(-6deg); } to { transform: rotate(10deg); } }
+.sn-eyes { transform-box: fill-box; transform-origin: center; animation: blink 5.5s infinite; }
+@keyframes blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+.sn-carrot { transform-box: fill-box; transform-origin: 0 50%; }
+.sn-carrot.lost { animation: carrot-lost 2.6s ease-in-out; }
+@keyframes carrot-lost {
+  0% { transform: none; }
+  14% { transform: translate(46px, -42px) rotate(38deg); }
+  34% { transform: translate(120px, 70px) rotate(160deg); }
+  54% { transform: translate(116px, 168px) rotate(230deg); }
+  78% { transform: translate(60px, 58px) rotate(100deg); }
+  100% { transform: none; }
+}
+
+.bubble {
+  position: absolute; left: 56%; bottom: 98%; width: max-content; max-width: 220px; z-index: 6;
+  padding: .6rem .85rem; border-radius: 16px; background: #fff; color: var(--ink);
+  font-weight: 800; font-size: .9rem; line-height: 1.3; text-align: left;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .4); pointer-events: none;
+  opacity: 0; transform: translateY(8px) scale(.9); transform-origin: 0 100%;
+  transition: opacity .25s ease, transform .35s var(--ease-pop);
+}
+.bubble::after { content: ''; position: absolute; left: 22px; bottom: -9px; border: 10px solid transparent; border-top-color: #fff; border-bottom: 0; }
+.bubble.show { opacity: 1; transform: none; }
+
+/* ---------- Guirlande lumineuse ---------- */
+.garland { position: fixed; left: 0; right: 0; top: var(--header-h); height: 70px; z-index: 49; pointer-events: none; }
+.garland svg { position: absolute; left: 0; top: 0; overflow: visible; max-width: none; }
+.garland .wire { fill: none; stroke: #07261b; stroke-width: 3; stroke-linecap: round; }
+.bulb {
+  position: absolute; width: 16px; height: 24px; margin-left: -8px; pointer-events: auto;
+  transform-origin: 50% 0; transform: rotate(var(--rot, 0deg)) scale(.2); opacity: 0;
+  transition: transform .7s var(--ease-pop), opacity .4s ease;
+}
+body.ready .bulb { transform: rotate(var(--rot, 0deg)) scale(1); opacity: 1; transition-delay: calc(var(--i) * 28ms + 1s); }
+.bulb::before { content: ''; position: absolute; left: 50%; top: -4px; width: 8px; height: 8px; margin-left: -4px; background: #1c2230; border-radius: 2px 2px 1px 1px; }
+.bulb::after {
+  content: ''; position: absolute; left: 1px; top: 3px; width: 14px; height: 20px;
+  border-radius: 50% 50% 50% 50% / 38% 38% 62% 62%;
+  background: radial-gradient(circle at 36% 30%, rgba(255, 255, 255, .92) 0 8%, var(--c) 32%, var(--c2) 100%);
+}
+.bulb .glow { position: absolute; left: -11px; top: -3px; width: 38px; height: 38px; border-radius: 50%; background: radial-gradient(circle, var(--c) 0%, transparent 62%); opacity: .6; mix-blend-mode: screen; pointer-events: none; }
+.bulb.pop { animation: bulb-pop .55s var(--ease-pop); }
+@keyframes bulb-pop { 40% { transform: rotate(var(--rot, 0deg)) scale(1.7); } }
+
+.garland[data-mode="twinkle"] .glow { animation: tw 2.4s ease-in-out calc(var(--r) * -1s) infinite; }
+.garland[data-mode="chase"] .glow { animation: chase 1.2s linear calc(var(--k) * -.3s) infinite; }
+.garland[data-mode="steady"] .glow { opacity: .75; animation: none; }
+.garland[data-mode="disco"] .bulb { animation: bulb-hue .9s linear calc(var(--r) * -1s) infinite; }
+.garland[data-mode="disco"] .glow { animation: disco-flash .45s steps(1) calc(var(--r) * -1s) infinite; }
+@keyframes tw { 0%, 100% { opacity: .8; } 50% { opacity: .15; } }
+@keyframes chase { 0%, 22% { opacity: .95; } 26%, 100% { opacity: .08; } }
+@keyframes disco-flash { 0% { opacity: 1; transform: scale(1.5); } 50% { opacity: .1; transform: scale(.7); } }
+@keyframes bulb-hue { from { filter: hue-rotate(0deg); } to { filter: hue-rotate(360deg); } }
+
+/* ---------- Traîneau du Père Noël ---------- */
+.flight { position: fixed; left: 0; top: 0; z-index: 47; pointer-events: none; }
+.flight-svg { display: block; position: absolute; left: 0; top: 0; overflow: visible; max-width: none; height: auto; pointer-events: auto; will-change: transform; filter: drop-shadow(0 8px 12px rgba(0, 0, 0, .4)); }
+.nose-glow { animation: halo 1.2s ease-in-out infinite; }
+.flight-svg.is-sil { filter: none; }
+
+.shoot {
+  position: fixed; z-index: 3; width: 150px; height: 2px; border-radius: 2px; pointer-events: none;
+  transform-origin: 0 50%; background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, .95));
+  box-shadow: 0 0 10px 2px rgba(255, 255, 255, .45);
+}
+
+.skygift {
+  position: fixed; left: 0; top: 0; z-index: 48; width: 58px; height: 58px; padding: 0;
+  will-change: transform; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .45));
+}
+.skygift .spr { width: 100%; height: 100%; animation: gift-hint 1.4s ease-in-out infinite; }
+.skygift.leaving { animation: gift-leave 1s ease-in forwards; }
+@keyframes gift-hint { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+@keyframes gift-leave { to { opacity: 0; } }
+
+/* ---------- Le grincheux vert ---------- */
+.grinch { position: fixed; left: 50%; bottom: 0; z-index: 46; width: min(62vw, 380px); pointer-events: none; transform: translate(-50%, 108%); transition: transform .9s var(--ease-pop); }
+.grinch.up { transform: translate(-50%, 6%); }
+.grinch svg { width: 100%; height: auto; }
+.grinch.up svg { transform-origin: 50% 100%; animation: grinch-peek 1.5s ease-in-out infinite alternate; }
+@keyframes grinch-peek { from { transform: rotate(-3.5deg); } to { transform: rotate(3.5deg); } }
+
+/* ---------- Lutins cachés ---------- */
+.elf { position: absolute; padding: 0; width: 46px; height: 50px; transform-origin: 50% 100%; z-index: 1; }
+.elf svg { width: 100%; height: 100%; overflow: visible; }
+.elf-svg { overflow: visible; }
+.elf-g { cursor: pointer; transform-box: fill-box; transform-origin: 50% 100%; }
+.elf-bell { animation: bell-glint 7s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes bell-glint { 0%, 86%, 100% { filter: none; transform: scale(1); } 91% { filter: drop-shadow(0 0 5px #fff) brightness(1.6); transform: scale(1.35); } 96% { filter: drop-shadow(0 0 2px #fff); transform: scale(1); } }
+.elf.hop, .elf-g.hop { animation: elf-hop .7s var(--ease-pop); }
+@keyframes elf-hop { 0% { transform: translateY(0); } 35% { transform: translateY(-18px) rotate(-8deg); } 70% { transform: translateY(0) rotate(5deg); } 100% { transform: none; } }
+.elf.found svg, .elf-g.found { filter: drop-shadow(0 0 6px rgba(255, 209, 102, .95)); }
+.elf-panel { top: -40px; right: 11%; z-index: 0; }
+.elf-footer { top: 6px; left: 14%; width: 44px; height: 48px; z-index: 1; }
+/* Le lutin des paquets se glisse derrière le 3e cadeau : seul son bonnet dépasse du bord du haut */
+.elf-card { top: -25px; right: 15%; width: 40px; height: 44px; z-index: -1; }
+
+@media (max-width: 640px) {
+  .moon { top: calc(var(--header-h) + 4px); right: 10px; width: 52px; }
+  .prop-tree { width: clamp(168px, 46vw, 230px); }
+}

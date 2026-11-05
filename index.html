@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ma Liste de Noël</title>
+  <meta name="description" content="Ma liste de Noël version féerique : déballe les paquets pour découvrir mes envies !">
+  <meta name="theme-color" content="#0a1230">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:title" content="Ma Liste de Noël">
+  <meta property="og:description" content="Déballe les paquets pour découvrir mes envies de Noël !">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+  <link rel="preload" href="assets/fonts/mountains-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/nunito.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/scene.css">
+  <link rel="stylesheet" href="css/ui.css">
+  <script>document.documentElement.className += ' js';</script>
+</head>
+<body>
+  <a class="skip-link" href="#liste">Aller directement à la liste</a>
+
+  <!-- ============ DÉCOR DE FOND (fixe) ============ -->
+  <div class="sky" aria-hidden="true">
+    <div class="aurora"><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
+    <div class="stars" id="stars"></div>
+  </div>
+  <canvas class="snow snow-back" id="snow-back" aria-hidden="true"></canvas>
+  <div class="rudolph-glow" id="rudolph-glow" aria-hidden="true"></div>
+  <div class="mood mood-grinch" id="mood-grinch" aria-hidden="true"></div>
+  <div class="mood mood-disco" id="mood-disco" aria-hidden="true"></div>
+  <div class="mood mood-blizzard" id="mood-blizzard" aria-hidden="true"></div>
+
+  <!-- ============ BARRE DU HAUT ============ -->
+  <header class="topbar" id="topbar">
+    <a class="brand" href="#haut" aria-label="Retour en haut de la page">
+      <span class="brand-ico" id="brand-ico" aria-hidden="true"></span>
+      <span class="brand-txt">Liste de Noël</span>
+    </a>
+
+    <nav class="topnav" aria-label="Navigation principale">
+      <a href="#liste" class="nav-link">Ma liste</a>
+    </nav>
+
+    <div class="tools">
+      <div class="cursor-switch" role="radiogroup" aria-label="Choisir mon curseur">
+        <button type="button" role="radio" aria-checked="false" data-cursor="gift" aria-label="Curseur : cadeau" title="Curseur : cadeau"></button>
+        <button type="button" role="radio" aria-checked="false" data-cursor="sleigh" aria-label="Curseur : traîneau" title="Curseur : traîneau"></button>
+        <button type="button" role="radio" aria-checked="false" data-cursor="reindeer" aria-label="Curseur : renne" title="Curseur : renne"></button>
+      </div>
+      <button type="button" class="tool" id="btn-sound" aria-pressed="false" aria-label="Activer le son" title="Son (clochettes)"></button>
+      <button type="button" class="tool" id="btn-calm" aria-pressed="false" aria-label="Mode calme" title="Mode calme : réduit les animations"></button>
+      <button type="button" class="tool tool-secrets" id="btn-secrets" aria-label="Ouvrir le carnet des secrets" title="Carnet des secrets">
+        <span class="tool-ico" id="secrets-ico" aria-hidden="true"></span>
+        <span class="tool-count" id="secrets-count">0/0</span>
+      </button>
+    </div>
+  </header>
+  <div class="garland" id="garland" aria-hidden="true"></div>
+
+  <main id="contenu">
+    <!-- ============ HÉROS ============ -->
+    <section class="hero" id="haut" aria-labelledby="title">
+      <div class="moon" id="moon" role="button" tabindex="0" aria-label="La lune" data-depth="-5" data-cursor-label="Touche-moi…">
+        <span class="moon-sil" id="moon-sil" aria-hidden="true"></span>
+      </div>
+
+      <div class="hero-content">
+        <p class="kicker">
+          <span class="kicker-star" data-art="star"></span>
+          <span id="kicker">Direction le pôle Nord</span>
+          <span class="kicker-star" data-art="star"></span>
+        </p>
+        <h1 class="title" id="title">Ma Liste de Noël</h1>
+        <p class="subtitle" id="subtitle">Chut… ici se cachent mes plus beaux souhaits.</p>
+
+        <div class="countdown" id="countdown" role="timer" aria-label="Compte à rebours avant Noël"></div>
+        <p class="count-msg" id="count-msg"></p>
+
+        <div class="hero-cta">
+          <a class="btn btn-candy" id="cta" href="#liste">
+            <span class="btn-ico" data-art="giftIcon" aria-hidden="true"></span>
+            <span>Ouvrir ma liste</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="scene" id="scene">
+        <div class="layer layer-village" id="layer-village" data-depth="6" aria-hidden="true"></div>
+        <div class="prop prop-snowman" id="snowman" data-depth="16"></div>
+        <div class="prop prop-tree" id="tree" data-depth="18"></div>
+        <div class="bubble" id="bubble" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- ============ LA LISTE ============ -->
+    <section class="liste" id="liste" aria-labelledby="liste-titre">
+      <div class="panel" id="panel">
+        <div class="snowcap" aria-hidden="true"></div>
+        <button type="button" class="elf elf-panel" data-elf="panel" aria-label="Un lutin se cache ici !"></button>
+
+        <header class="panel-head reveal">
+          <h2 class="h2" id="liste-titre">Ma Liste</h2>
+          <div class="holly-divider" data-art="holly" aria-hidden="true"></div>
+        </header>
+
+        <div class="letter reveal" id="letter"></div>
+
+        <div class="demo-banner" id="demo-banner" hidden></div>
+
+        <div class="toolbar reveal" id="toolbar">
+          <label class="search">
+            <span class="sr-only">Chercher un cadeau</span>
+            <span class="search-ico" data-art="search" aria-hidden="true"></span>
+            <input type="search" id="q" placeholder="Chercher un cadeau…" autocomplete="off" spellcheck="false">
+          </label>
+          <div class="chips" id="chips" role="group" aria-label="Filtrer par catégorie"></div>
+          <div class="tool-row">
+            <label class="select">
+              <span>Trier</span>
+              <select id="sort">
+                <option value="original">Ordre de ma liste</option>
+                <option value="priorite">Mes plus grandes envies</option>
+                <option value="prix-asc">Prix croissant</option>
+                <option value="prix-desc">Prix décroissant</option>
+                <option value="nom">De A à Z</option>
+              </select>
+            </label>
+            <button type="button" class="btn btn-small btn-ghost" id="unwrap-all">Tout déballer</button>
+            <button type="button" class="btn btn-small btn-ghost" id="wrap-all">Tout emballer</button>
+          </div>
+        </div>
+
+        <p class="count" id="count" aria-live="polite"></p>
+        <div class="grid" id="grid"></div>
+        <div class="empty" id="empty" hidden></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ PIED DE PAGE ============ -->
+  <footer class="footer" id="footer">
+    <div class="footer-snow" aria-hidden="true"></div>
+    <div class="footer-inner">
+      <p class="footer-title">Joyeux Noël&nbsp;!</p>
+      <p class="footer-text">Fait avec <span class="heart" data-art="heart" aria-label="amour"></span> et beaucoup de chocolat chaud.</p>
+      <p class="footer-small">
+        <button type="button" class="link" id="footer-secrets">Carnet des secrets</button>
+        <span aria-hidden="true">·</span>
+        <span id="elf-count">Lutins : 0/0</span>
+      </p>
+    </div>
+    <button type="button" class="elf elf-footer" data-elf="footer" aria-label="Un lutin se cache ici !"></button>
+  </footer>
+
+  <button type="button" class="to-top" id="to-top" aria-label="Remonter en haut" data-cursor-label="Hop, là-haut !"></button>
+
+  <!-- ============ COUCHES AVANT (neige, effets, messages) ============ -->
+  <canvas class="snow snow-front" id="snow-front" aria-hidden="true"></canvas>
+  <div class="flight" id="flight" aria-hidden="true"></div>
+  <canvas id="fx" aria-hidden="true"></canvas>
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+  <!-- Carnet des secrets : un calque classique (et non un <dialog> natif) pour que notre curseur reste visible devant -->
+  <div class="secrets-overlay" id="secrets-overlay" hidden>
+    <div class="secrets-backdrop" id="secrets-backdrop"></div>
+    <section class="secrets" id="secrets-dialog" role="dialog" aria-modal="true" aria-labelledby="secrets-title" tabindex="-1">
+      <header class="secrets-head">
+        <h2 id="secrets-title">Carnet des secrets</h2>
+        <button type="button" class="icon-btn" id="secrets-close" aria-label="Fermer le carnet">×</button>
+      </header>
+      <p class="secrets-intro">Le Père Noël a caché des surprises un peu partout sur ce site. Arriveras-tu à toutes les trouver&nbsp;?</p>
+      <div class="secrets-progress">
+        <div class="bar"><i id="secrets-bar"></i></div>
+        <span id="secrets-progress-txt">0 / 0</span>
+      </div>
+      <ul class="secrets-list" id="secrets-list"></ul>
+      <div class="secrets-foot">
+        <button type="button" class="link" id="secrets-reset">Tout réinitialiser</button>
+      </div>
+    </section>
+  </div>
+
+  <noscript>
+    <p class="noscript">Ce site féerique a besoin de JavaScript pour que la magie opère. Active-le et reviens&nbsp;! 🎄</p>
+  </noscript>
+
+  <!-- Contenu de la liste (le seul fichier à modifier) -->
+  <script src="data/ma-liste.js"></script>
+  <!-- Moteur du site -->
+  <script src="js/core.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/art.js"></script>
+  <script src="js/fx.js"></script>
+  <script src="js/cursor.js"></script>
+  <script src="js/scene.js"></script>
+  <script src="js/liste.js"></script>
+  <script src="js/secrets.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
