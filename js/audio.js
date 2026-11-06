@@ -1,6 +1,6 @@
 /* ==========================================================================
    AUDIO — clochettes de Noël synthétisées avec WebAudio (aucun fichier .mp3)
-   Le son est désactivé par défaut et ne démarre jamais tout seul.
+  Le son est activé par défaut, mais le navigateur attend toujours un geste utilisateur.
    ========================================================================== */
 (function () {
   'use strict';
@@ -54,7 +54,7 @@
   }
 
   const A = (Noel.audio = {
-    enabled: !!Noel.store.get('sound', false),
+    enabled: !!Noel.store.get('sound', true),
     NOTES,
 
     setEnabled(value) {
