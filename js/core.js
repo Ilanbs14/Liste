@@ -130,7 +130,8 @@
 
   /* ---------- Format des prix ---------- */
   Noel.fmtPrice = (n) => {
-    if (n == null || n === '' || isNaN(Number(n))) return '';
+    if (n == null || String(n).trim() === '') return '';
+    if (isNaN(Number(n))) return String(n).trim();
     const cfg = (window.NOEL && window.NOEL.config) || {};
     const v = Number(n);
     try {

@@ -18,7 +18,7 @@
      nom          (obligatoire) Le nom du cadeau
      categorie    (obligatoire) L'id d'une catégorie ci-dessous (ex. "techno")
      priorite     1 = petit plaisir · 2 = j'en rêve · 3 = LE cadeau de mes rêves
-     prix         Un nombre, sans le symbole (ex. 59.9) — ou laisse vide
+    prix         Un nombre (ex. 59.9) ou un texte libre (ex. "à partir de 50 €") — ou laisse vide
      lien         L'adresse de la page du produit — ou laisse vide
      emoji        Un emoji (ex. "🎧") OU l'adresse d'une photo du produit (ex. "https://…/casque.jpg",
                   formats png, jpg, webp, gif, avif…). Une photo remplace l'emoji.

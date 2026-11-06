@@ -95,14 +95,18 @@
   }
 
   function parsePrix(v) {
-    let s = String(v == null ? '' : v).replace(/[\s  ]/g, '').replace(/[^\d,.\-]/g, '');
-    if (!s) return null;
+    const raw = String(v == null ? '' : v).trim();
+    if (!raw) return null;
+    const numeric = raw.replace(/[\s  ]/g, '');
+    if (!/^(?:[€$£]|EUR|USD|CHF)?-?[\d.,]+(?:[€$£]|EUR|USD|CHF)?$/i.test(numeric)) return raw;
+    let s = raw.replace(/[\s  ]/g, '').replace(/[^\d,.\-]/g, '');
+    if (!s || !/^-?[\d.,]+$/.test(s)) return raw;
     if (s.indexOf(',') >= 0 && s.indexOf('.') >= 0) {            // « 1.299,90 » ou « 1,299.90 » : le dernier séparateur est la virgule des décimales
       const dec = s.lastIndexOf(',') > s.lastIndexOf('.') ? ',' : '.';
       s = s.split(dec === ',' ? '.' : ',').join('').replace(dec, '.');
     } else if (s.indexOf(',') >= 0) s = s.replace(',', '.');
     const n = parseFloat(s);
-    return isNaN(n) ? null : n;
+    return isNaN(n) ? raw : n;
   }
 
   const parseBool = (v) => /^(oui|o|yes|y|x|1|true|vrai|✓|✔|✅|reserve|reservé|réservé|pris)$/i.test(String(v == null ? '' : v).trim());
