@@ -121,10 +121,9 @@
     const mood = $('#mood-grinch');
     mood.classList.add('on');
     const face = document.createElement('div');
-    face.className = 'grinch';
+    face.className = 'grinch up';
     face.innerHTML = Noel.art.grinch();
     document.body.appendChild(face);
-    requestAnimationFrame(() => requestAnimationFrame(() => face.classList.add('up')));
     Noel.toast('<b>Le grincheux vert est là…</b><br><span class="toast-small">« Je vais voler ta liste ! »</span>', { duration: 3400 });
     await Noel.wait(1600);
     $$('.gift').forEach((g, i) => setTimeout(() => g.classList.add('stolen'), i * 90));

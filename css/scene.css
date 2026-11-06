@@ -232,8 +232,8 @@ body.ready .bulb { transform: rotate(var(--rot, 0deg)) scale(1); opacity: 1; tra
 @keyframes gift-leave { to { opacity: 0; } }
 
 /* ---------- Le grincheux vert ---------- */
-.grinch { position: fixed; left: 50%; bottom: 0; z-index: 46; width: min(62vw, 380px); pointer-events: none; transform: translate(-50%, 108%); transition: transform .9s var(--ease-pop); }
-.grinch.up { transform: translate(-50%, 6%); }
+.grinch { position: fixed; left: 50%; top: 50%; z-index: 46; width: min(62vw, 380px); pointer-events: none; transform: translate(-50%, -50%); }
+.grinch.up { transform: translate(-50%, -50%); }
 .grinch svg { width: 100%; height: auto; }
 .grinch.up svg { transform-origin: 50% 100%; animation: grinch-peek 1.5s ease-in-out infinite alternate; }
 @keyframes grinch-peek { from { transform: rotate(-3.5deg); } to { transform: rotate(3.5deg); } }
